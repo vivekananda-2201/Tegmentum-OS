@@ -70,7 +70,8 @@
 | <kbd>Super</kbd> + <kbd>W</kbd> | Close Active Window |
 | <kbd>Super</kbd> + <kbd>B</kbd> | Hide / Restore Floating Windows |
 | <kbd>Super</kbd> + <kbd>E</kbd> | File Manager (Nautilus) |
-| <kbd>Super</kbd> + <kbd>F</kbd> | Toggle Fullscreen |
+| <kbd>Super</kbd> + <kbd>F</kbd> | Toggle Fullscreen (Entire Screen) |
+| <kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>F</kbd> | Toggle Full Window (Maximize / Tiled Fullscreen) |
 | <kbd>Super</kbd> + <kbd>J</kbd> | Toggle Window Split (Vertical / Horizontal) |
 | <kbd>Super</kbd> + <kbd>L</kbd> | **Toggle Workspace Layout (Dwindle / Scrolling)** |
 | <kbd>Super</kbd> + <kbd>←/→/↑/↓</kbd> | Navigate / Focus Windows |

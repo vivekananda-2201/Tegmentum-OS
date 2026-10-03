@@ -408,8 +408,10 @@ When you run `./install.sh`:
   - Full keypad support (`KP_Add`, `KP_Subtract`) and symbol variations (`=`, `+`, `-`, `_`) with `{ repeating = true }`.
 - **Window Split Toggle**:
   - Bound <kbd>Super</kbd> + <kbd>J</kbd> to `hl.dsp.layout("togglesplit")` allowing instantaneous switching between horizontal and vertical tiling splits for the focused window in dwindle layout.
+- **Full Window (Tiled Fullscreen / Maximize)**:
+  - Bound <kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>F</kbd> to `hl.dsp.window.fullscreen({ mode = 1 })`, maximizing the active window within the tiling layout to occupy the full workspace while keeping top bars (Waybar) and gaps visible (distinguished from pure fullscreen <kbd>Super</kbd> + <kbd>F</kbd> mode 0).
 - **Cheatsheet Sync**:
-  - Updated [`~/.config/quickshell/KeybindsWindow.qml`](file:///home/vicky/.config/quickshell/KeybindsWindow.qml) database to display all updated navigation, sizing, and split bindings.
+  - Updated [`~/.config/quickshell/KeybindsWindow.qml`](file:///home/vicky/.config/quickshell/KeybindsWindow.qml) database to display all updated navigation, sizing, split, and full window bindings.
 
 
 

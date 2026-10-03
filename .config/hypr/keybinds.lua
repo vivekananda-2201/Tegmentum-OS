@@ -22,7 +22,8 @@ hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("qs ipc call keybinds toggle")) -- Ke
 
 hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("qs -n -p ~/.config/quickshell/hyprquickpaper")) -- Wallpapers
 
-hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = 0 })) -- Fullscreen
+hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = 0 }), { description = "Toggle fullscreen (entire screen)" })
+hl.bind(mainMod .. " + CTRL + F", hl.dsp.window.fullscreen({ mode = 1 }), { description = "Toggle full window (tiled fullscreen / maximize)" })
 
 hl.bind(mainMod .. " + O", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/opacity.sh")) -- Opacity
 
