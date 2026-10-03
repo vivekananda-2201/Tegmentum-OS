@@ -26,6 +26,13 @@ hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = 0 })) -- Fullscreen
 
 hl.bind(mainMod .. " + O", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/opacity.sh")) -- Opacity
 
+-- Toggle workspace layout between dwindle and scrolling (persistent per workspace)
+hl.bind(
+	mainMod .. " + S",
+	hl.dsp.exec_cmd("python3 " .. home .. "/.config/hypr/scripts/toggle-workspace-layout.py"),
+	{ description = "Toggle workspace layout (dwindle / scrolling)" }
+)
+
 -- hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("python3 " .. home .. "/.config/43pr/bin/theme.py toggle")) -- Light/dark toggle
 
 -- Mouse move/resize window

@@ -70,5 +70,6 @@ require("keybinds")
 require("look")
 require("rules")
 require("autostart")
+pcall(require, "workspace-layouts")
 -- HyprMod managed settings
 require("hyprland-gui")

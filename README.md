@@ -71,6 +71,7 @@
 | <kbd>Super</kbd> + <kbd>B</kbd> | Hide / Restore Floating Windows |
 | <kbd>Super</kbd> + <kbd>E</kbd> | File Manager (Nautilus) |
 | <kbd>Super</kbd> + <kbd>F</kbd> | Toggle Fullscreen |
+| <kbd>Super</kbd> + <kbd>S</kbd> | **Toggle Workspace Layout (Dwindle / Scrolling)** |
 | <kbd>Super</kbd> + <kbd>Tab</kbd> | Lock Session (Hyprlock) |
 | <kbd>Super</kbd> + <kbd>I</kbd> | Open System Settings |
 | <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>W</kbd> | Open Wallpaper Selector |

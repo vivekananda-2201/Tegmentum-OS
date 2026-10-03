@@ -104,6 +104,7 @@ PanelWindow {
         { keys: "SUPER + F", desc: "Toggle window fullscreen", category: "Windows" },
         { keys: "SUPER + ALT + F", desc: "Toggle float, center & resize (70%)", category: "Windows" },
         { keys: "SUPER + O", desc: "Toggle window opacity", category: "Windows" },
+        { keys: "SUPER + S", desc: "Toggle workspace layout (dwindle / scrolling)", category: "Workspaces" },
 
         // System & Control
         { keys: "SUPER + TAB", desc: "Lock screen (hyprlock)", category: "System" },

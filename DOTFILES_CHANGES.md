@@ -359,10 +359,35 @@ When you run `./install.sh`:
 - **Fresh Install Automation (`install.sh`)**:
   - Added systemd-logind drop-in configuration (`/etc/systemd/logind.conf.d/hyprland-lid.conf` with `HandleLidSwitch=ignore`) directly in `install.sh` so any fresh installation automatically sets this behavior by default.
 - **Files Modified / Created**:
-  - [`~/.config/hypr/scripts/lid-handler.sh`](file:///home/vicky/.config/hypr/scripts/lid-handler.sh) & [`~/dotfiles/.config/hypr/scripts/lid-handler.sh`](file:///home/vicky/dotfiles/.config/hypr/scripts/lid-handler.sh)
-  - [`~/.config/hypr/hyprland.lua`](file:///home/vicky/.config/hypr/hyprland.lua) & [`~/dotfiles/.config/hypr/hyprland.lua`](file:///home/vicky/dotfiles/.config/hypr/hyprland.lua)
-  - [`~/.config/hypr/keybinds.lua`](file:///home/vicky/.config/hypr/keybinds.lua) & [`~/dotfiles/.config/hypr/keybinds.lua`](file:///home/vicky/dotfiles/.config/hypr/keybinds.lua)
-  - [`~/dotfiles/install.sh`](file:///home/vicky/dotfiles/install.sh)
+  - [`~/.config/hypr/scripts/lid-handler.sh`](file:///home/vicky/.config/hypr/scripts/lid-handler.sh) & [`~/Tegmentum-OS/.config/hypr/scripts/lid-handler.sh`](file:///home/vicky/Tegmentum-OS/.config/hypr/scripts/lid-handler.sh)
+  - [`~/.config/hypr/hyprland.lua`](file:///home/vicky/.config/hypr/hyprland.lua) & [`~/Tegmentum-OS/.config/hypr/hyprland.lua`](file:///home/vicky/Tegmentum-OS/.config/hypr/hyprland.lua)
+  - [`~/.config/hypr/keybinds.lua`](file:///home/vicky/.config/hypr/keybinds.lua) & [`~/Tegmentum-OS/.config/hypr/keybinds.lua`](file:///home/vicky/Tegmentum-OS/.config/hypr/keybinds.lua)
+  - [`~/Tegmentum-OS/install.sh`](file:///home/vicky/Tegmentum-OS/install.sh)
+
+---
+
+## 22. Persistent Per-Workspace Layout Toggling (Dwindle ⇄ Scrolling)
+- **Goal**:
+  - Allow toggling the active workspace layout between `dwindle` (binary split) and `scrolling` (horizontal tape layout) via a dedicated shortcut.
+  - Changes must be isolated per workspace and persistent across reboots.
+- **Implementation**:
+  - Created [`~/.config/hypr/scripts/toggle-workspace-layout.py`](file:///home/vicky/.config/hypr/scripts/toggle-workspace-layout.py):
+    - Reads active workspace ID/name and `tiledLayout` via `hyprctl activeworkspace -j`.
+    - Toggles between `dwindle` and `scrolling`.
+    - Dynamically evaluates and applies the layout to the active workspace in real time: `hyprctl eval "hl.workspace_rule({ workspace = '...', layout = '...' })"`.
+    - Persists the mapping into [`~/.config/hypr/workspace-layouts.lua`](file:///home/vicky/.config/hypr/workspace-layouts.lua) and mirrors to `~/Tegmentum-OS/.config/hypr/workspace-layouts.lua`.
+    - Sends synchronous Dunst notification (`notify-send`) and Hyprland notification badge (`hyprctl notify`).
+  - Added split-out loader `pcall(require, "workspace-layouts")` in [`~/.config/hypr/hyprland.lua`](file:///home/vicky/.config/hypr/hyprland.lua) so that all persistent rules load automatically on boot.
+  - Bound <kbd>Super</kbd> + <kbd>S</kbd> in [`~/.config/hypr/keybinds.lua`](file:///home/vicky/.config/hypr/keybinds.lua).
+  - Added <kbd>Super</kbd> + <kbd>S</kbd> to the live cheatsheet in [`~/.config/quickshell/KeybindsWindow.qml`](file:///home/vicky/.config/quickshell/KeybindsWindow.qml).
+- **Files Modified / Created**:
+  - [`~/.config/hypr/scripts/toggle-workspace-layout.py`](file:///home/vicky/.config/hypr/scripts/toggle-workspace-layout.py)
+  - [`~/.config/hypr/workspace-layouts.lua`](file:///home/vicky/.config/hypr/workspace-layouts.lua)
+  - [`~/.config/hypr/hyprland.lua`](file:///home/vicky/.config/hypr/hyprland.lua)
+  - [`~/.config/hypr/keybinds.lua`](file:///home/vicky/.config/hypr/keybinds.lua)
+  - [`~/.config/quickshell/KeybindsWindow.qml`](file:///home/vicky/.config/quickshell/KeybindsWindow.qml)
+  - [`~/Tegmentum-OS/README.md`](file:///home/vicky/Tegmentum-OS/README.md)
+
 
 
 
