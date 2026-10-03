@@ -154,10 +154,28 @@ local function raiseActive()
 end
 
 local function focusAndRaise(dispatcher)
+	local cur = hl.get_active_window()
+	local prev_fs = cur and cur.fullscreen or 0
+
 	hl.dispatch(dispatcher)
-	raiseActive()
-	hl.timer(function()
+
+	local function preserveFullscreenAndRaise()
+		local target = hl.get_active_window()
+		if target then
+			-- Mode 1: Full window (tiled fullscreen / maximize)
+			-- Mode 2: Absolute fullscreen (mode 0, entire screen)
+			if prev_fs == 1 and target.fullscreen ~= 1 then
+				hl.dispatch(hl.dsp.window.fullscreen({ mode = 1 }))
+			elseif prev_fs == 2 and target.fullscreen ~= 2 then
+				hl.dispatch(hl.dsp.window.fullscreen({ mode = 0 }))
+			end
+		end
 		raiseActive()
+	end
+
+	preserveFullscreenAndRaise()
+	hl.timer(function()
+		preserveFullscreenAndRaise()
 	end, { timeout = 25, type = "oneshot" })
 end
 
@@ -277,7 +295,7 @@ end, { description = "Cycle to next window" })
 
 -- Previous window
 hl.bind("ALT + SHIFT + Tab", function()
-	focusAndRaise(hl.dsp.window.cycle_next({ forward = false }))
+	focusAndRaise(hl.dsp.window.cycle_next({ prev = true }))
 end, { description = "Cycle to previous window" })
 
 ----------------------------------------------------------------
@@ -291,7 +309,7 @@ end, { description = "Next floating window" })
 
 -- Previous floating window
 hl.bind("ALT + SHIFT + GRAVE", function()
-	focusAndRaise(hl.dsp.window.cycle_next({ floating = true, forward = false }))
+	focusAndRaise(hl.dsp.window.cycle_next({ floating = true, prev = true }))
 end, { description = "Previous floating window" })
 
 -- Jump directly to a floating window

@@ -413,6 +413,17 @@ When you run `./install.sh`:
 - **Cheatsheet Sync**:
   - Updated [`~/.config/quickshell/KeybindsWindow.qml`](file:///home/vicky/.config/quickshell/KeybindsWindow.qml) database to display all updated navigation, sizing, split, and full window bindings.
 
+---
+
+## 25. Fullscreen Mode Inheritance During Window Cycling & True Reverse Cycling
+- **Goal**:
+  1. Fullscreen / Full Window Persistence: When a window is in fullscreen (<kbd>Super</kbd> + <kbd>F</kbd>, mode 0) or full window (<kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>F</kbd>, mode 1), cycling between windows via <kbd>Alt</kbd> + <kbd>Tab</kbd> or arrow keys must automatically preserve and inherit that exact mode instead of exiting to normal tiling.
+  2. True Reverse Cycling: Fix <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>Tab</kbd> and <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>`</kbd> cycling in reverse direction rather than forward.
+- **Implementation**:
+  - Upgraded `focusAndRaise(dispatcher)` in [`~/.config/hypr/keybinds.lua`](file:///home/vicky/.config/hypr/keybinds.lua) to read the initial window's `fullscreen` state (`0` = normal, `1` = full window/maximize, `2` = absolute fullscreen).
+  - Automatically re-applies `hl.dsp.window.fullscreen({ mode = 1 })` or `mode = 0` to newly focused windows so navigation keeps the active viewport in full window / fullscreen without disruption.
+  - Replaced unsupported `forward = false` argument with Hyprland's native `{ prev = true }` for reverse cycling.
+
 
 
 
