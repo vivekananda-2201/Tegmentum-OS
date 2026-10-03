@@ -33,6 +33,13 @@ hl.bind(
 	{ description = "Toggle workspace layout (dwindle / scrolling)" }
 )
 
+-- Toggle window split of focused window
+hl.bind(
+	mainMod .. " + J",
+	hl.dsp.layout("togglesplit"),
+	{ description = "Toggle window split (vertical / horizontal)" }
+)
+
 -- Mouse move/resize window
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })

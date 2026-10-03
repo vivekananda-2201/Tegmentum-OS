@@ -71,6 +71,7 @@
 | <kbd>Super</kbd> + <kbd>B</kbd> | Hide / Restore Floating Windows |
 | <kbd>Super</kbd> + <kbd>E</kbd> | File Manager (Nautilus) |
 | <kbd>Super</kbd> + <kbd>F</kbd> | Toggle Fullscreen |
+| <kbd>Super</kbd> + <kbd>J</kbd> | Toggle Window Split (Vertical / Horizontal) |
 | <kbd>Super</kbd> + <kbd>L</kbd> | **Toggle Workspace Layout (Dwindle / Scrolling)** |
 | <kbd>Super</kbd> + <kbd>←/→/↑/↓</kbd> | Navigate / Focus Windows |
 | <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>←/→/↑/↓</kbd> | Move Active Window in Direction |

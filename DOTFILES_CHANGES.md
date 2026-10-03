@@ -406,8 +406,10 @@ When you run `./install.sh`:
   - Width precise (10px): <kbd>Super</kbd> + <kbd>Alt</kbd> + <kbd>+</kbd> (expand) / <kbd>-</kbd> (shrink)
   - Height precise (10px): <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>+</kbd> (expand) / <kbd>-</kbd> (shrink)
   - Full keypad support (`KP_Add`, `KP_Subtract`) and symbol variations (`=`, `+`, `-`, `_`) with `{ repeating = true }`.
+- **Window Split Toggle**:
+  - Bound <kbd>Super</kbd> + <kbd>J</kbd> to `hl.dsp.layout("togglesplit")` allowing instantaneous switching between horizontal and vertical tiling splits for the focused window in dwindle layout.
 - **Cheatsheet Sync**:
-  - Updated [`~/.config/quickshell/KeybindsWindow.qml`](file:///home/vicky/.config/quickshell/KeybindsWindow.qml) database to display all updated navigation and sizing bindings.
+  - Updated [`~/.config/quickshell/KeybindsWindow.qml`](file:///home/vicky/.config/quickshell/KeybindsWindow.qml) database to display all updated navigation, sizing, and split bindings.
 
 
 
