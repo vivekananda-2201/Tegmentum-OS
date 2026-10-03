@@ -1,0 +1,652 @@
+@import "colors.css";
+
+/* ==========================================================================
+   Pitch Black Minimal & Premium OLED Theme (GTK 3 & 4)
+   ========================================================================== */
+
+/* Libadwaita Color Tokens */
+@define-color window_bg_color #000000;
+@define-color window_fg_color #eaecef;
+@define-color view_bg_color #000000;
+@define-color view_fg_color #eaecef;
+@define-color headerbar_bg_color #000000;
+@define-color headerbar_fg_color #eaecef;
+@define-color headerbar_backdrop_color #000000;
+@define-color headerbar_border_color #141414;
+@define-color sidebar_bg_color #000000;
+@define-color sidebar_fg_color #c8ccd2;
+@define-color sidebar_backdrop_color #000000;
+@define-color sidebar_border_color #141414;
+@define-color card_bg_color #0a0a0a;
+@define-color card_fg_color #eaecef;
+@define-color card_border_color #1a1a1a;
+@define-color popover_bg_color #0a0a0a;
+@define-color popover_fg_color #eaecef;
+@define-color dialog_bg_color #000000;
+@define-color dialog_fg_color #eaecef;
+
+/* GTK Base Tokens - Synced with Blue Theme */
+@define-color theme_bg_color #000000;
+@define-color theme_fg_color #eaecef;
+@define-color theme_base_color #000000;
+@define-color theme_text_color #eaecef;
+@define-color theme_selected_bg_color #0e1e2d;
+@define-color theme_selected_fg_color #98ccf9;
+@define-color borders #161616;
+@define-color accent_color #98ccf9;
+@define-color accent_bg_color #98ccf9;
+@define-color accent_fg_color #000000;
+
+/* Base Surfaces - OLED Pitch Black */
+window,
+window.background,
+.background,
+dialog.background,
+filechooser,
+filechooser box,
+filechooser paned,
+.dialog-vbox,
+.dialog-action-box,
+.dialog-action-area,
+splitview,
+navigationview,
+scrolledwindow,
+viewport,
+notebook,
+notebook > stack {
+    background-color: #000000;
+    color: #eaecef;
+}
+
+/* Headerbar */
+headerbar {
+    background-color: #000000;
+    color: #eaecef;
+    box-shadow: none;
+}
+
+headerbar:backdrop {
+    background-color: #000000;
+}
+
+/* Window title & subtitle in headerbars */
+headerbar .title,
+headerbar label.title,
+windowtitle label.title,
+.titlebar .title {
+    color: #eaecef;
+    font-weight: 600;
+    opacity: 1;
+}
+
+headerbar .subtitle,
+headerbar label.subtitle,
+windowtitle label.subtitle,
+.titlebar .subtitle {
+    color: #8e95a0;
+    font-size: smaller;
+    opacity: 1;
+}
+
+/* Sidebar Container (Nautilus & File Choosers) */
+.sidebar,
+navigation-sidebar,
+.navigation-sidebar,
+placessidebar,
+placessidebar.sidebar,
+placessidebar viewport {
+    background-color: #000000;
+}
+
+/* Sidebar navigation rows - native compact sizing */
+.navigation-sidebar row,
+navigation-sidebar row,
+.sidebar list row,
+.sidebar row,
+placessidebar row.sidebar-row,
+placessidebar row {
+    color: #9da3ad;
+    background-color: transparent;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    transition: background-image 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Hover: subtle transparent blue gradient */
+.navigation-sidebar row:hover,
+navigation-sidebar row:hover,
+.sidebar list row:hover,
+.sidebar row:hover,
+placessidebar row.sidebar-row:hover,
+placessidebar row:hover {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.14), rgba(152, 204, 249, 0.02));
+    border: 1px solid rgba(152, 204, 249, 0.20);
+    color: #ffffff;
+}
+
+/* Selected: crisp clean outline with subtle translucent blue gradient */
+.navigation-sidebar row:selected,
+navigation-sidebar row:selected,
+.sidebar list row:selected,
+.sidebar row:selected,
+placessidebar row.sidebar-row:selected,
+placessidebar row:selected {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.22), rgba(152, 204, 249, 0.08));
+    border: 1px solid rgba(152, 204, 249, 0.40);
+    color: #98ccf9;
+    font-weight: 600;
+}
+
+.navigation-sidebar row:selected:hover,
+navigation-sidebar row:selected:hover,
+.sidebar list row:selected:hover,
+.sidebar row:selected:hover,
+placessidebar row.sidebar-row:selected:hover,
+placessidebar row:selected:hover {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.28), rgba(152, 204, 249, 0.12));
+    border: 1px solid rgba(152, 204, 249, 0.55);
+    color: #cce5ff;
+}
+
+/* Generic List & Rows */
+list {
+    background-color: #000000;
+    color: #eaecef;
+}
+
+row {
+    background-color: transparent;
+    background-image: none;
+    color: #eaecef;
+    border: 1px solid transparent;
+    transition: background-image 0.12s ease;
+}
+
+row:hover {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.14), rgba(152, 204, 249, 0.02));
+    border: 1px solid rgba(152, 204, 249, 0.20);
+}
+
+row:selected {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.22), rgba(152, 204, 249, 0.08));
+    border: 1px solid rgba(152, 204, 249, 0.40);
+    color: #98ccf9;
+}
+
+/* Main Content Views */
+.view,
+gridview,
+listview,
+columnview {
+    background-color: #000000;
+    color: #eaecef;
+}
+
+/* File Grid View */
+gridview > child,
+flowbox > flowboxchild {
+    background-color: transparent;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 6px;
+    transition: background-image 0.12s ease, border-color 0.12s ease;
+}
+
+gridview > child:hover,
+flowbox > flowboxchild:hover {
+    background-color: transparent;
+    background-image: linear-gradient(135deg, rgba(152, 204, 249, 0.14), rgba(152, 204, 249, 0.02));
+    border: 1px solid rgba(152, 204, 249, 0.20);
+}
+
+gridview > child:selected,
+flowbox > flowboxchild:selected {
+    background-color: transparent;
+    background-image: linear-gradient(135deg, rgba(152, 204, 249, 0.24), rgba(152, 204, 249, 0.08));
+    border: 1px solid rgba(152, 204, 249, 0.45);
+    color: #ffffff;
+}
+
+gridview > child:selected:hover,
+flowbox > flowboxchild:selected:hover {
+    background-color: transparent;
+    background-image: linear-gradient(135deg, rgba(152, 204, 249, 0.30), rgba(152, 204, 249, 0.12));
+    border: 1px solid rgba(152, 204, 249, 0.60);
+}
+
+/* File List View */
+listview > row {
+    background-color: transparent;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    transition: background-image 0.12s ease, border-color 0.12s ease;
+}
+
+listview > row:hover {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.14), rgba(152, 204, 249, 0.02));
+    border: 1px solid rgba(152, 204, 249, 0.20);
+}
+
+listview > row:selected {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.24), rgba(152, 204, 249, 0.08));
+    border: 1px solid rgba(152, 204, 249, 0.45);
+    color: #ffffff;
+}
+
+listview > row:selected:hover {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.30), rgba(152, 204, 249, 0.12));
+    border: 1px solid rgba(152, 204, 249, 0.60);
+}
+
+/* Path Bar (Breadcrumbs) - Nautilus & File Choosers */
+.path-bar button,
+button.path-bar-button,
+widget.path-bar button,
+widget.path-bar.linked button,
+pathbar button,
+button.slider-button {
+    background-color: #0c0c0c;
+    background-image: none;
+    color: #8e95a0;
+    border: 1px solid #202020;
+    border-radius: 6px;
+    margin: 0 1px;
+}
+
+.path-bar button:hover,
+button.path-bar-button:hover,
+widget.path-bar button:hover,
+widget.path-bar.linked button:hover,
+pathbar button:hover,
+button.slider-button:hover {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.14), rgba(152, 204, 249, 0.02));
+    border-color: rgba(152, 204, 249, 0.22);
+    color: #ffffff;
+}
+
+.path-bar button:checked,
+button.path-bar-button:checked,
+.path-bar button:active,
+button.path-bar-button:active,
+widget.path-bar button:checked,
+widget.path-bar.linked button:checked,
+pathbar button:checked {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.22), rgba(152, 204, 249, 0.08));
+    border: 1px solid rgba(152, 204, 249, 0.45);
+    color: #98ccf9;
+    font-weight: 600;
+}
+
+/* Buttons */
+button {
+    background-color: #0c0c0c;
+    background-image: none;
+    color: #cdd2d8;
+    border: 1px solid #202020;
+    border-radius: 6px;
+    transition: background-image 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+button:hover {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.14), rgba(152, 204, 249, 0.02));
+    border-color: rgba(152, 204, 249, 0.25);
+    color: #ffffff;
+}
+
+button:active {
+    background-color: rgba(152, 204, 249, 0.18);
+    color: #ffffff;
+}
+
+button:checked {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.22), rgba(152, 204, 249, 0.08));
+    border-color: rgba(152, 204, 249, 0.45);
+    color: #98ccf9;
+    font-weight: 600;
+}
+
+button.flat {
+    background-color: transparent;
+    background-image: none;
+    border-color: transparent;
+}
+
+button.flat:hover {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.14), rgba(152, 204, 249, 0.02));
+    border-color: rgba(152, 204, 249, 0.22);
+    color: #ffffff;
+}
+
+button.flat:checked {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.22), rgba(152, 204, 249, 0.08));
+    border-color: rgba(152, 204, 249, 0.45);
+    color: #98ccf9;
+}
+
+/* Input Entries (Inputs, search bars, file name fields in dialogs) */
+entry,
+headerbar entry,
+searchbar entry,
+filechooser entry,
+.entry {
+    background-color: #050505;
+    background-image: none;
+    color: #eaecef;
+    border: 1px solid #202020;
+    border-radius: 6px;
+    padding: 5px 8px;
+    caret-color: #98ccf9;
+    box-shadow: none;
+}
+
+entry:focus,
+headerbar entry:focus,
+searchbar entry:focus,
+filechooser entry:focus,
+.entry:focus {
+    background-color: #000000;
+    background-image: none;
+    color: #ffffff;
+    border: 1px solid #98ccf9;
+    box-shadow: 0 0 0 1px rgba(152, 204, 249, 0.3);
+}
+
+entry:backdrop,
+headerbar entry:backdrop,
+searchbar entry:backdrop,
+filechooser entry:backdrop {
+    background-color: #050505;
+    color: #9da3ad;
+    border-color: #1a1a1a;
+}
+
+entry selection,
+entry:focus selection,
+headerbar entry selection,
+filechooser entry selection {
+    background-color: #1e3a5f;
+    color: #ffffff;
+}
+
+/* Headerbar buttons (Cancel, Open, Search, etc.) */
+headerbar button,
+headerbar button.flat,
+headerbar button.titlebutton {
+    background-color: #0c0c0c;
+    background-image: none;
+    color: #eaecef;
+    border: 1px solid #202020;
+    border-radius: 6px;
+}
+
+headerbar button:hover,
+headerbar button.flat:hover,
+headerbar button.titlebutton:hover {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.14), rgba(152, 204, 249, 0.02));
+    border-color: rgba(152, 204, 249, 0.25);
+    color: #ffffff;
+}
+
+headerbar button:active,
+headerbar button.flat:active {
+    background-color: rgba(152, 204, 249, 0.18);
+    color: #ffffff;
+}
+
+headerbar button.suggested-action,
+button.suggested-action {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.25), rgba(152, 204, 249, 0.10));
+    border: 1px solid rgba(152, 204, 249, 0.45);
+    color: #98ccf9;
+    font-weight: 600;
+}
+
+headerbar button.suggested-action:hover,
+button.suggested-action:hover {
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.35), rgba(152, 204, 249, 0.15));
+    border-color: rgba(152, 204, 249, 0.65);
+    color: #ffffff;
+}
+
+/* Popovers & Context Menus */
+popover,
+popover.menu,
+.popover {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+popover > arrow,
+popover.menu > arrow {
+    background: transparent;
+    border: none;
+}
+
+popover > contents,
+popover.menu > contents,
+.popover > contents,
+menu,
+.menu {
+    background-color: #000000;
+    color: #eaecef;
+    border: 1px solid #1c1c1c;
+    border-radius: 8px;
+    padding: 4px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+popover modelbutton,
+popover.menu modelbutton,
+menuitem {
+    color: #9da3ad;
+    background-color: transparent;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    min-height: 24px;
+    padding: 3px 8px;
+    margin: 1px 2px;
+    transition: background-image 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+popover modelbutton:hover,
+popover.menu modelbutton:hover,
+menuitem:hover {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.14), rgba(152, 204, 249, 0.02));
+    border: 1px solid rgba(152, 204, 249, 0.20);
+    color: #ffffff;
+}
+
+popover modelbutton:selected,
+popover.menu modelbutton:selected,
+popover modelbutton:active,
+popover.menu modelbutton:active,
+menuitem:selected {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.22), rgba(152, 204, 249, 0.08));
+    border: 1px solid rgba(152, 204, 249, 0.40);
+    color: #98ccf9;
+    font-weight: 600;
+}
+
+popover separator,
+popover.menu separator,
+menu separator {
+    background-color: #161616;
+    min-height: 1px;
+    margin: 4px 6px;
+}
+
+/* Notebook & Tabs (GTK 3/4) */
+notebook > header {
+    background-color: #000000;
+    border-bottom: 1px solid #141414;
+}
+
+notebook > header > tabs > tab {
+    background-color: transparent;
+    color: #8e95a0;
+    border: 1px solid transparent;
+    padding: 6px 12px;
+}
+
+notebook > header > tabs > tab:hover {
+    color: #ffffff;
+    background-image: linear-gradient(to bottom, rgba(152, 204, 249, 0.14), rgba(152, 204, 249, 0.02));
+}
+
+notebook > header > tabs > tab:checked {
+    background-image: linear-gradient(to bottom, rgba(152, 204, 249, 0.22), rgba(152, 204, 249, 0.08));
+    color: #98ccf9;
+    border-bottom: 2px solid #98ccf9;
+}
+
+/* TreeView (File list, settings lists) */
+treeview,
+treeview.view {
+    background-color: #000000;
+    color: #eaecef;
+}
+
+treeview header button,
+treeview header button:hover,
+treeview.view header button,
+treeview.view header button:hover,
+treeview column header button,
+treeview column header button:hover {
+    background-color: #050505;
+    background-image: none;
+    color: #8e95a0;
+    border: none;
+    border-bottom: 1px solid #141414;
+    border-right: 1px solid #141414;
+    box-shadow: none;
+    padding: 5px 8px;
+}
+
+treeview header button:hover,
+treeview.view header button:hover,
+treeview column header button:hover {
+    background-color: #101010;
+    color: #ffffff;
+}
+
+treeview.view:hover {
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.14), rgba(152, 204, 249, 0.02));
+}
+
+treeview.view:selected,
+treeview.view:selected:focus {
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.24), rgba(152, 204, 249, 0.08));
+    color: #98ccf9;
+}
+
+/* Combobox (File filter dropdowns, etc.) */
+combobox,
+combobox button,
+combobox.linked button {
+    background-color: #0c0c0c;
+    background-image: none;
+    color: #eaecef;
+    border: 1px solid #202020;
+    border-radius: 6px;
+}
+
+combobox:hover,
+combobox button:hover {
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.14), rgba(152, 204, 249, 0.02));
+    border-color: rgba(152, 204, 249, 0.25);
+    color: #ffffff;
+}
+
+combobox window.popup,
+combobox menu {
+    background-color: #000000;
+    color: #eaecef;
+    border: 1px solid #1c1c1c;
+    border-radius: 8px;
+    padding: 4px;
+}
+
+/* Dialog Action Area (Cancel, Save, Open) */
+dialog-action-area button,
+.dialog-action-area button {
+    background-color: #0c0c0c;
+    background-image: none;
+    color: #eaecef;
+    border: 1px solid #202020;
+    border-radius: 6px;
+    padding: 6px 14px;
+}
+
+dialog-action-area button:hover,
+.dialog-action-area button:hover {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.14), rgba(152, 204, 249, 0.02));
+    border-color: rgba(152, 204, 249, 0.25);
+    color: #ffffff;
+}
+
+dialog-action-area button.suggested-action,
+.dialog-action-area button.suggested-action {
+    background-color: transparent;
+    background-image: linear-gradient(to right, rgba(152, 204, 249, 0.22), rgba(152, 204, 249, 0.08));
+    border: 1px solid rgba(152, 204, 249, 0.45);
+    color: #98ccf9;
+}
+
+/* Search bar & Action bar */
+searchbar,
+.search-bar {
+    background-color: #000000;
+    border-bottom: 1px solid #141414;
+}
+
+actionbar,
+actionbar > revealer > box {
+    background-color: #000000;
+    border-top: 1px solid #141414;
+}
+
+/* Scrollbars */
+scrollbar {
+    background-color: transparent;
+    border: none;
+}
+
+scrollbar slider {
+    background-color: #222222;
+    border-radius: 8px;
+    min-width: 6px;
+    min-height: 6px;
+}
+
+scrollbar slider:hover {
+    background-color: #333333;
+}
+
+scrollbar slider:active {
+    background-color: #98ccf9;
+}

@@ -1,0 +1,86 @@
+/* Power Menu Theme — matching 43PR Rofi aesthetic */
+@import "colors.rasi"
+
+configuration {
+    show-icons: false;
+    hover-select: true;
+    me-select-entry: "";
+    me-accept-entry: "MousePrimary";
+    click-to-exit: true;
+}
+
+* {    
+    background-color: transparent;
+    text-color: @fg;
+    margin: 0;
+    padding: 0;
+    spacing: 0;
+}
+
+window {
+    location: northeast;
+    anchor: northeast;
+    x-offset: -10px;
+    y-offset: 10px;
+    width: 200px;
+    background-color: @bg;
+    border: 1px;
+    border-color: @border-color;
+    border-radius: 10px;
+    padding: 8px;
+}
+
+mainbox {
+    orientation: vertical;
+    background-color: transparent;
+    children: [ listview ];
+}
+
+listview {
+    background-color: transparent;
+    border: 0;
+    spacing: 4px;
+    padding: 0;
+    lines: 6;
+    columns: 1;
+    fixed-height: false;
+    scrollbar: false;
+}
+
+element {
+    background-color: transparent;
+    border: 1px;
+    border-color: transparent;
+    border-radius: 10px;
+    padding: 8px 14px;
+    spacing: 12px;
+}
+
+element-text {
+    background-color: transparent;
+    text-color: inherit;
+    vertical-align: 0.5;
+    font: "Iosevka Nerd Font 11";
+}
+
+element normal.normal,
+element alternate.normal {
+    background-color: transparent;
+    text-color: @fg;
+    border-color: transparent;
+}
+
+element normal.active,
+element alternate.active {
+    background-color: transparent;
+    text-color: @border-color;
+    border-color: transparent;
+}
+
+element selected.normal,
+element selected.active {
+    background-color: @bg-selected;
+    border: 1px;
+    border-color: @border-color;
+    text-color: @border-color;
+}

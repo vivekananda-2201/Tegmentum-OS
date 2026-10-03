@@ -1,0 +1,146 @@
+# 43PR/dotfiles
+# Install e.g.: sudo pacman -S cava
+# Remove e.g.: sudo pacman -R cava
+
+# --------------------------------------------------
+# Hyprland / Wayland / Desktop
+# --------------------------------------------------
+
+hyprland
+hyprlock
+wlogout
+quickshell
+waybar
+rofi
+polkit-kde-agent
+
+# --------------------------------------------------
+# Wayland / X11 Compatibility / Desktop Portals
+# --------------------------------------------------
+
+xdg-desktop-portal-hyprland
+xorg-xwayland
+
+# --------------------------------------------------
+# Wallpaper / Screenshots / Image Tools
+# --------------------------------------------------
+
+awww
+grim
+slurp
+imagemagick
+matugen
+python
+
+# --------------------------------------------------
+# Networking / Bluetooth
+# --------------------------------------------------
+
+networkmanager
+nm-applet
+bluez
+bluez-utils
+
+# --------------------------------------------------
+# Audio
+# --------------------------------------------------
+
+pipewire
+pipewire-audio
+pipewire-pulse
+wireplumber
+playerctl
+
+# --------------------------------------------------
+# Clipboard
+# --------------------------------------------------
+
+cliphist
+wl-clipboard
+
+# --------------------------------------------------
+# Terminal / Shell / Editors
+# --------------------------------------------------
+
+kitty
+alacritty
+neovim
+ripgrep
+fd
+zsh
+zsh-autosuggestions
+zsh-syntax-highlighting
+starship
+eza
+
+# --------------------------------------------------
+# File Manager / File Utilities
+# --------------------------------------------------
+
+nautilus
+xed
+tumbler
+ffmpegthumbnailer
+ncdu
+
+# --------------------------------------------------
+# GTK / Icons / Appearance
+# --------------------------------------------------
+
+papirus-icon-theme
+papirus-folders
+nwg-look
+
+# --------------------------------------------------
+# Media
+# --------------------------------------------------
+
+mpv
+
+# --------------------------------------------------
+# System Monitoring / Hardware
+# --------------------------------------------------
+
+btop
+nvtop
+dmidecode
+brightnessctl
+gammastep
+
+# --------------------------------------------------
+# Desktop Notifications
+# --------------------------------------------------
+
+dunst
+
+# --------------------------------------------------
+# Terminal / System Visualizers
+# --------------------------------------------------
+
+cava
+fastfetch
+cmatrix
+
+# --------------------------------------------------
+# Fonts
+# --------------------------------------------------
+
+ttf-jetbrains-mono-nerd
+ttf-iosevka-nerd
+ttf-font-awesome
+ttf-roboto-mono
+
+# --------------------------------------------------
+# Package / Application Utilities
+# --------------------------------------------------
+
+flatpak
+curl
+unzip
+
+# --------------------------------------------------
+# Hyprland Companion Apps (AUR)
+# --------------------------------------------------
+
+hyprmod
+

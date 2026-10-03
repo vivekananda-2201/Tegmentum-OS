@@ -1,0 +1,8 @@
+
+[Default Applications]
+text/html=opera-gx.desktop
+x-scheme-handler/http=opera-gx.desktop
+x-scheme-handler/https=opera-gx.desktop
+x-scheme-handler/about=opera-gx.desktop
+x-scheme-handler/unknown=opera-gx.desktop
+inode/directory=org.gnome.Nautilus.desktop
