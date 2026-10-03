@@ -10,143 +10,106 @@
 
 # Tegmentum OS
 
-**A performance-driven, keyboard-centric Arch Linux & Hyprland environment.**  
-*Crafted with precision by [Vivekananda](https://github.com/vivekananda-2201).*
+**A Minimal, High-Performance Arch Linux & Hyprland Environment**  
+*Designed and crafted by [Vivekananda](https://github.com/vivekananda-2201)*
 
 [![Arch Linux](https://img.shields.io/badge/Base-Arch%20Linux-1793D1?style=for-the-badge&logo=arch-linux&logoColor=white)](https://archlinux.org/)
 [![Hyprland](https://img.shields.io/badge/Compositor-Hyprland%20(Lua)-00A3E0?style=for-the-badge&logo=wayland&logoColor=white)](https://hyprland.org/)
-[![Quickshell](https://img.shields.io/badge/Widgets-Quickshell-7aa2f7?style=for-the-badge)](https://quickshell.outfoxxed.me/)
-[![Neovim](https://img.shields.io/badge/Editor-LazyVim%20%7C%20Oxocarbon-57A143?style=for-the-badge&logo=neovim&logoColor=white)](https://neovim.io/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+[![Quickshell](https://img.shields.io/badge/Interface-Quickshell-7aa2f7?style=for-the-badge)](https://quickshell.outfoxxed.me/)
+[![Neovim](https://img.shields.io/badge/IDE-LazyVim%20%7C%20Oxocarbon-57A143?style=for-the-badge&logo=neovim&logoColor=white)](https://neovim.io/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 
 </div>
 
 ---
 
-> [!NOTE]
-> **Vision:** Tegmentum OS began as a meticulously curated personal desktop environment on top of Arch Linux and Hyprland, tuned for high efficiency, seamless hybrid GPU management, and unified aesthetics. It is actively evolving into a fully standalone, out-of-the-box operating system distribution.
+## Overview
+
+**Tegmentum OS** is an engineered, keyboard-centric computing environment built on Arch Linux and the Hyprland Wayland compositor. Focused on operational speed, visual restraint, and hardware reliability, it provides an uncompromising workstation experience with unified design language, hardware-level power optimizations, and native interface widgets.
 
 ---
 
-## Highlights & Features
+## Architecture & System Features
 
-### 1. Compositor & Display Management (Hyprland Lua)
-- **Lua Configuration Backend**: Configured natively via Hyprland's modern Lua engine (`hyprland.lua`, `keybinds.lua`, `look.lua`, `monitors.lua`, `rules.lua`).
-- **Dynamic Clamshell & Lid Switch**: Custom hardware dispatcher (`lid-handler.sh`) turns off only the internal laptop screen and locks the session via `hyprlock`. External monitors remain 100% active and intact without freezing hybrid GPUs (Intel/NVIDIA). Opening the lid immediately turns on the screen with `hyprlock` ready.
-- **Adaptive Monitor Scaling**: Automatic HiDPI detection with high-refresh rate support (144Hz) and transparent fallback configuration for external displays.
-- **Fluid Animation Curves**: Custom cubic-bezier animations (`md3_decel`, `easeOutExpo`, `popin 60%`) engineered for zero input delay and crisp window transitions.
+### Compositor & Display Management
+- **Lua Configuration Engine**: Native configuration powered by Hyprland's Lua backend for modular, performant compositor control.
+- **Physics-Calibrated Motion**: Custom cubic-bezier transition curves (`md3_decel`, `easeOutExpo`, `popin 60%`) tuned for instantaneous feedback and fluid window movement.
+- **Intelligent Clamshell Handler**: Custom lid state dispatcher (`lid-handler.sh`) powers off the internal laptop screen and locks via `hyprlock`, while preserving connected external monitors intact without triggering GPU driver freezes.
+- **Dynamic Display Configuration**: Automatic resolution and high-refresh detection (144Hz) with unified fallback scaling across multi-monitor topologies.
 
-### 2. Native Interactive Widgets (Quickshell)
-- **Keybindings Visualizer (`Super + K`)**: Keyboard-driven cheatsheet window with instant fuzzy filtering. Pressing `Enter` isolates the selected row on screen for 1 second, then smoothly dissolves away.
-- **Precision Brightness OSD**: Custom animated brightness indicator supporting fine 1% adjustments in low light (including 0% for privacy) and 5% steps in standard ranges.
-- **Wallpaper Switcher (`Super + Shift + W`)**: Built on `hyprquickpaper` with instant wallpaper swapping, thumbnail caching, and automated palette extraction.
-- **Settings Center (`Super + I`)**: Centralized toggle panel for Network, Bluetooth, Audio Sinks, per-app volume, and display configuration.
+### Interactive Interface Suite (Quickshell)
+- **Keybindings Visualizer (<kbd>Super</kbd> + <kbd>K</kbd>)**: Interactive modal cheatsheet with real-time fuzzy search. Selecting an entry isolates the binding in-place for 1 second before automatically fading away.
+- **Precision Brightness HUD**: Custom animated on-screen display featuring 1% granular increments at low light levels (supporting true 0% for privacy) and 5% steps in normal ranges.
+- **Control Center (<kbd>Super</kbd> + <kbd>I</kbd>)**: Fast toggles for network connections, Bluetooth devices, audio sinks, and display properties.
+- **Wallpaper Orchestrator (<kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>W</kbd>)**: Powered by `hyprquickpaper`, featuring live thumbnail generation and real-time palette extraction.
 
-### 3. Top Status Bar (Waybar)
-- **Optically Balanced Indicators**: Volume and Battery modules configured with custom font side-bearing compensation for uniform visual gaps.
-- **Music Marquee & Controls**: Live MPRIS player title scrolling with play/pause and track skipping controls.
-- **Power Menu Button**: Quick-launch trigger for the top-right Rofi power menu.
+### Status Bar & Launchers
+- **Waybar**: Minimalist panel featuring optically balanced audio and battery metrics, live MPRIS media marquee, and system indicators.
+- **Application Search (<kbd>Super</kbd> + <kbd>Space</kbd>)**: Fast fuzzy launcher powered by Rofi.
+- **Power Menu (<kbd>Super</kbd> + <kbd>`</kbd>)**: Top-right session manager for instant Lock, Suspend, Hibernate, Reboot, and Shutdown.
+- **Clipboard Management (<kbd>Super</kbd> + <kbd>V</kbd>)**: Cliphist clipboard cache integrated directly into Rofi with image and text previews.
 
-### 4. Application Launchers & Menus (Rofi)
-- **Application Drawer (`Super + Space`)**: Fast fuzzy searching through all desktop apps.
-- **Top-Right Power Menu (`Super + ` `)**: Sleek, high-contrast session manager positioned at the top right (Lock, Suspend, Hibernate, Logout, Reboot, Shutdown).
-- **Clipboard History (`Super + V`)**: Cliphist manager integrated directly into Rofi with image and text preview.
-
-### 5. Terminals & Shells
-- **Kitty & Alacritty**: Pre-configured dual terminals with dynamic Matugen color generation and customized padding.
-- **Floating Terminal (`Super + Ctrl + Enter`)**: Dedicated instant terminal overlay for quick tasks.
-- **Zsh & Starship**: Ultra-responsive shell with syntax highlighting, autosuggestions, and Up/Down history prefix search.
-
-### 6. Developer Environment (Neovim / LazyVim)
-- Full LazyVim distribution customized with the high-contrast **Oxocarbon** colorscheme.
-- Automatic disk reload notifications when buffers change externally.
-- Fast fuzzy navigation powered by `ripgrep` and `fd`.
-
-### 7. Pitch Black GTK 3 & GTK 4 Theme
-- Handcrafted OLED minimal stylesheet (`gtk.css`) providing true `#000000` dark backgrounds across native GTK apps and file dialogs.
+### Development Environment & Terminal
+- **Terminals**: Kitty and Alacritty configured with dynamic Matugen color syncing.
+- **Floating Scratchpad Terminal (<kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>Return</kbd>)**: Dedicated terminal overlay for rapid terminal workflows.
+- **Shell**: Zsh augmented with Starship prompt, syntax highlighting, autosuggestions, and prefix-matched history navigation.
+- **Neovim / LazyVim**: Tailored LazyVim setup styled with the Oxocarbon dark theme, external buffer change detection, and high-speed fuzzy search (`ripgrep` / `fd`).
+- **OLED GTK Theme**: Deep pitch-black `#000000` minimal dark theme across all GTK 3 and GTK 4 applications.
 
 ---
 
-## Keybindings Cheatsheet
+## Primary Keybindings
 
-| Keybinding | Action |
+| Shortcut | Function |
 | :--- | :--- |
-| <kbd>Super</kbd> + <kbd>Return</kbd> | Open Primary Terminal (Kitty) |
-| <kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>Return</kbd> | Open Floating Terminal |
+| <kbd>Super</kbd> + <kbd>Return</kbd> | Launch Primary Terminal (Kitty) |
+| <kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>Return</kbd> | Toggle Floating Terminal |
 | <kbd>Super</kbd> + <kbd>Space</kbd> | Application Launcher (Rofi) |
-| <kbd>Super</kbd> + <kbd>K</kbd> | **Keybindings Visualizer (Search & Auto-dismiss)** |
-| <kbd>Super</kbd> + <kbd>`</kbd> | **Power Menu (Top-Right Rofi)** |
-| <kbd>Super</kbd> + <kbd>W</kbd> | Close Focused Window |
-| <kbd>Super</kbd> + <kbd>B</kbd> | Hide / Unhide Floating Windows |
+| <kbd>Super</kbd> + <kbd>K</kbd> | Keybindings Visualizer & Search |
+| <kbd>Super</kbd> + <kbd>`</kbd> | Power Menu (Top-Right) |
+| <kbd>Super</kbd> + <kbd>W</kbd> | Close Active Window |
+| <kbd>Super</kbd> + <kbd>B</kbd> | Hide / Restore Floating Windows |
 | <kbd>Super</kbd> + <kbd>E</kbd> | File Manager (Nautilus) |
 | <kbd>Super</kbd> + <kbd>F</kbd> | Toggle Fullscreen |
-| <kbd>Super</kbd> + <kbd>Tab</kbd> | Lock Screen (Hyprlock) |
-| <kbd>Super</kbd> + <kbd>I</kbd> | Toggle Settings Panel |
-| <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>W</kbd> | Wallpaper Picker (`hyprquickpaper`) |
+| <kbd>Super</kbd> + <kbd>Tab</kbd> | Lock Session (Hyprlock) |
+| <kbd>Super</kbd> + <kbd>I</kbd> | Open System Settings |
+| <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>W</kbd> | Open Wallpaper Selector |
 | <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>Space</kbd> | Toggle Waybar Visibility |
 | <kbd>Super</kbd> + <kbd>V</kbd> | Clipboard History |
 | <kbd>Print</kbd> | Fullscreen Screenshot |
-| <kbd>Super</kbd> + <kbd>Print</kbd> | Interactive Area Screenshot |
-| <kbd>Brightness Keys</kbd> | Brightness Control (0–100%) + Quickshell OSD |
-| <kbd>Volume Keys</kbd> | Audio Control + Quickshell OSD |
-
-*Press <kbd>Super</kbd> + <kbd>K</kbd> at any time to open the live interactive keybinding cheatsheet.*
+| <kbd>Super</kbd> + <kbd>Print</kbd> | Region Screenshot |
+| <kbd>Brightness Keys</kbd> | Granular Brightness + OSD |
+| <kbd>Volume Keys</kbd> | Audio Control + OSD |
 
 ---
 
 ## Installation
 
-### Prerequisites
-- An **Arch Linux** installation (or Arch derivatives: EndeavourOS, CachyOS, Manjaro).
-- Working internet connection and `git`.
+### Requirements
+- Arch Linux or an Arch-based distribution (e.g., EndeavourOS, CachyOS).
+- Active network connection and `git`.
 
 ### Quick Setup
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/vivekananda-2201/Tegmentum-OS.git
-   cd Tegmentum-OS
-   ```
+```bash
+git clone https://github.com/vivekananda-2201/Tegmentum-OS.git
+cd Tegmentum-OS
+chmod +x install.sh
+./install.sh
+```
 
-2. **Run the automated installer:**
-   ```bash
-   chmod +x install.sh
-   ./install.sh
-   ```
-
-### What `install.sh` Does:
-- Verifies Arch compatibility and detects or bootstraps `yay` / `paru`.
-- Automatically splits and installs all official and AUR packages from [`packages.txt`](packages.txt).
-- Sets up PipeWire audio services (`pipewire`, `wireplumber`).
-- Configures systemd logind (`/etc/systemd/logind.conf.d/hyprland-lid.conf`) to delegate laptop lid actions cleanly to Hyprland without sleeping.
-- Backs up existing `~/.config` files to `~/.config-backups/<timestamp>/`.
-- Installs all `.config` files and `.zshrc`.
-- Automatically sets executable permissions on all shell scripts.
-- Generates initial themes and palettes dynamically with `theme.py`.
-
-3. **Log out and select Hyprland** at your display manager (or launch with `Hyprland`).
+### What the Installer Automates:
+1. Detects package manager (`pacman`) and bootstraps AUR helper (`yay`) if needed.
+2. Resolves and installs all required system, audio, UI, and font packages.
+3. Automatically backs up existing configuration files to `~/.config-backups/`.
+4. Deploys `.config` directories, shell scripts, and `.zshrc`.
+5. Sets up PipeWire audio services (`pipewire`, `pipewire-pulse`, `wireplumber`).
+6. Configures systemd logind (`HandleLidSwitch=ignore`) so Hyprland handles lid closing seamlessly.
+7. Compiles initial theme palettes via Matugen and sets execution permissions.
 
 ---
 
-## Long-Term OS Roadmap
+## License
 
-- [x] **Phase 1: Foundation (Current)**
-  - Comprehensive Hyprland + Quickshell + Waybar desktop environment.
-  - Hybrid laptop lid management and clamshell support.
-  - Interactive cheatsheet visualizer and precision OSD widgets.
-  - Automated installation and package management pipeline.
-- [ ] **Phase 2: Custom Tooling & System Packaging**
-  - Standalone `tegmentum-cli` for system updates and configuration switches.
-  - Dedicated package repository hosting custom compiled binaries.
-  - Integrated backup/restore snapshots with Btrfs/Snapper.
-- [ ] **Phase 3: Turnkey Distribution ISO**
-  - Custom Archiso profile with Calamares / archinstall integration.
-  - Bootable live media with pre-installed Tegmentum environment.
-
----
-
-## Credits & License
-
-- Designed and developed by **Vivekananda** ([@vivekananda-2201](https://github.com/vivekananda-2201)).
-- Core components built on top of [Hyprland](https://github.com/hyprwm/Hyprland), [Quickshell](https://github.com/outfoxxed/quickshell), and [Arch Linux](https://archlinux.org/).
-- Licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE).  
+Authored and maintained by **Vivekananda** ([@vivekananda-2201](https://github.com/vivekananda-2201)).
