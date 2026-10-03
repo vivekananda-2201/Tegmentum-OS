@@ -110,7 +110,7 @@ PanelWindow {
 
         // System & Control
         { keys: "SUPER + TAB", desc: "Lock screen (hyprlock)", category: "System" },
-        { keys: "SUPER + `", desc: "Power menu (rofi powermenu)", category: "System" },
+        { keys: "SUPER + ESC", desc: "Power menu (rofi powermenu)", category: "System" },
         { keys: "SUPER + I", desc: "Toggle quickshell settings", category: "System" },
         { keys: "SUPER + K", desc: "Keybindings cheatsheet & search", category: "System" },
         { keys: "SUPER + SHIFT + W", desc: "Wallpaper switcher (hyprquickpaper)", category: "System" },

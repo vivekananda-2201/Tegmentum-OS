@@ -423,6 +423,8 @@ When you run `./install.sh`:
   - Upgraded `focusAndRaise(dispatcher)` in [`~/.config/hypr/keybinds.lua`](file:///home/vicky/.config/hypr/keybinds.lua) to read the initial window's `fullscreen` state (`0` = normal, `1` = full window/maximize, `2` = absolute fullscreen).
   - Automatically re-applies `hl.dsp.window.fullscreen({ mode = 1 })` or `mode = 0` to newly focused windows so navigation keeps the active viewport in full window / fullscreen without disruption.
   - Replaced unsupported `forward = false` argument with Hyprland's native `{ prev = true }` for reverse cycling.
+- **Power Menu Shortcut Rebound**:
+  - Rebound the rofi power menu from <kbd>Super</kbd> + <kbd>`</kbd> to <kbd>Super</kbd> + <kbd>Esc</kbd>.
 
 
 

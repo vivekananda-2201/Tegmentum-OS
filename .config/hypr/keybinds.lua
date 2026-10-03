@@ -15,7 +15,7 @@ hl.bind(mainMod .. " + W", hl.dsp.window.close())
 
 hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd("hyprlock")) -- Lock screen
 
-hl.bind(mainMod .. " + GRAVE", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/powermenu.sh")) -- Power menu
+hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/powermenu.sh"), { description = "Power menu" })
 
 hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("qs ipc call settings toggle")) -- Settings
 hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("qs ipc call keybinds toggle")) -- Keybindings Cheatsheet

@@ -66,7 +66,7 @@
 | <kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>Return</kbd> | Toggle Floating Terminal |
 | <kbd>Super</kbd> + <kbd>Space</kbd> | Application Launcher (Rofi) |
 | <kbd>Super</kbd> + <kbd>K</kbd> | Keybindings Visualizer & Search |
-| <kbd>Super</kbd> + <kbd>`</kbd> | Power Menu (Top-Right) |
+| <kbd>Super</kbd> + <kbd>Esc</kbd> | Power Menu (Top-Right) |
 | <kbd>Super</kbd> + <kbd>W</kbd> | Close Active Window |
 | <kbd>Super</kbd> + <kbd>B</kbd> | Hide / Restore Floating Windows |
 | <kbd>Super</kbd> + <kbd>E</kbd> | File Manager (Nautilus) |
