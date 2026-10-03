@@ -104,7 +104,7 @@ PanelWindow {
         { keys: "SUPER + F", desc: "Toggle window fullscreen", category: "Windows" },
         { keys: "SUPER + ALT + F", desc: "Toggle float, center & resize (70%)", category: "Windows" },
         { keys: "SUPER + O", desc: "Toggle window opacity", category: "Windows" },
-        { keys: "SUPER + S", desc: "Toggle workspace layout (dwindle / scrolling)", category: "Workspaces" },
+        { keys: "SUPER + L", desc: "Toggle workspace layout (dwindle / scrolling)", category: "Workspaces" },
 
         // System & Control
         { keys: "SUPER + TAB", desc: "Lock screen (hyprlock)", category: "System" },
@@ -123,20 +123,20 @@ PanelWindow {
         { keys: "SHIFT + Print", desc: "Screenshot area select (slurp)", category: "Screenshot" },
 
         // Window Focus & Navigation
-        { keys: "ALT + TAB", desc: "Cycle focus to next window", category: "Navigation" },
-        { keys: "ALT + SHIFT + TAB", desc: "Cycle focus to previous window", category: "Navigation" },
-        { keys: "ALT + `", desc: "Cycle next floating window", category: "Navigation" },
-        { keys: "ALT + SHIFT + `", desc: "Cycle previous floating window", category: "Navigation" },
+        { keys: "ALT + TAB", desc: "Cycle focus to next window & raise", category: "Navigation" },
+        { keys: "ALT + SHIFT + TAB", desc: "Cycle focus to previous window & raise", category: "Navigation" },
+        { keys: "ALT + `", desc: "Cycle next floating window & raise", category: "Navigation" },
+        { keys: "ALT + SHIFT + `", desc: "Cycle previous floating window & raise", category: "Navigation" },
         { keys: "ALT + F", desc: "Focus and raise floating window", category: "Navigation" },
-        { keys: "SUPER + H", desc: "Focus window left (vim-style)", category: "Navigation" },
-        { keys: "SUPER + J", desc: "Focus window down (vim-style)", category: "Navigation" },
-        { keys: "SUPER + Up", desc: "Focus window up", category: "Navigation" },
-        { keys: "SUPER + L", desc: "Focus window right (vim-style)", category: "Navigation" },
+        { keys: "SUPER + ← / → / ↑ / ↓", desc: "Focus window in direction & raise", category: "Navigation" },
 
         // Window Moving & Sizing
-        { keys: "SUPER + SHIFT + H / J / K / L", desc: "Move window left / down / up / right", category: "Windows" },
-        { keys: "SUPER + CTRL + H / J / K / L", desc: "Resize active window (40px delta)", category: "Windows" },
-        { keys: "SUPER + ALT + CTRL + Arrows/HJKL", desc: "Move floating window (40px step)", category: "Windows" },
+        { keys: "SUPER + SHIFT + ← / → / ↑ / ↓", desc: "Move window left / right / up / down", category: "Windows" },
+        { keys: "SUPER + [+] / [-]", desc: "Expand / shrink window width (50px)", category: "Windows" },
+        { keys: "SUPER + SHIFT + [+] / [-]", desc: "Expand / shrink window height (50px)", category: "Windows" },
+        { keys: "SUPER + ALT + [+] / [-]", desc: "Precise expand / shrink width (10px)", category: "Windows" },
+        { keys: "SUPER + SHIFT + ALT + [+] / [-]", desc: "Precise expand / shrink height (10px)", category: "Windows" },
+        { keys: "SUPER + ALT + CTRL + Arrows", desc: "Move floating window (40px step)", category: "Windows" },
         { keys: "SUPER + Mouse Left Drag", desc: "Move window with mouse cursor", category: "Mouse" },
         { keys: "SUPER + Mouse Right Drag", desc: "Resize window with mouse cursor", category: "Mouse" },
         { keys: "SUPER + Scroll Up / Down", desc: "Zoom desktop in / out", category: "System" },

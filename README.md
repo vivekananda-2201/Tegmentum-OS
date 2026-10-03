@@ -71,14 +71,21 @@
 | <kbd>Super</kbd> + <kbd>B</kbd> | Hide / Restore Floating Windows |
 | <kbd>Super</kbd> + <kbd>E</kbd> | File Manager (Nautilus) |
 | <kbd>Super</kbd> + <kbd>F</kbd> | Toggle Fullscreen |
-| <kbd>Super</kbd> + <kbd>S</kbd> | **Toggle Workspace Layout (Dwindle / Scrolling)** |
+| <kbd>Super</kbd> + <kbd>L</kbd> | **Toggle Workspace Layout (Dwindle / Scrolling)** |
+| <kbd>Super</kbd> + <kbd>←/→/↑/↓</kbd> | Navigate / Focus Windows |
+| <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>←/→/↑/↓</kbd> | Move Active Window in Direction |
+| <kbd>Super</kbd> + <kbd>+</kbd> / <kbd>-</kbd> | Resize Window Width (50px) |
+| <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>+</kbd> / <kbd>-</kbd> | Resize Window Height (50px) |
+| <kbd>Super</kbd> + <kbd>Alt</kbd> + <kbd>+</kbd> / <kbd>-</kbd> | Precise Resize Width (10px) |
+| <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>+</kbd> / <kbd>-</kbd> | Precise Resize Height (10px) |
+| <kbd>Alt</kbd> + <kbd>Tab</kbd> | Cycle Windows & Raise to Top |
 | <kbd>Super</kbd> + <kbd>Tab</kbd> | Lock Session (Hyprlock) |
 | <kbd>Super</kbd> + <kbd>I</kbd> | Open System Settings |
 | <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>W</kbd> | Open Wallpaper Selector |
 | <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>Space</kbd> | Toggle Waybar Visibility |
 | <kbd>Super</kbd> + <kbd>V</kbd> | Clipboard History |
 | <kbd>Print</kbd> | Fullscreen Screenshot |
-| <kbd>Super</kbd> + <kbd>Print</kbd> | Region Screenshot |
+| <kbd>Shift</kbd> + <kbd>Print</kbd> | Region Screenshot |
 | <kbd>Brightness Keys</kbd> | Granular Brightness + OSD |
 | <kbd>Volume Keys</kbd> | Audio Control + OSD |
 

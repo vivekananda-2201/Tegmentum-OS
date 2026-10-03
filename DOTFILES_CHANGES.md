@@ -378,8 +378,8 @@ When you run `./install.sh`:
     - Persists the mapping into [`~/.config/hypr/workspace-layouts.lua`](file:///home/vicky/.config/hypr/workspace-layouts.lua) and mirrors to `~/Tegmentum-OS/.config/hypr/workspace-layouts.lua`.
     - Sends synchronous Dunst notification (`notify-send`) and Hyprland notification badge (`hyprctl notify`).
   - Added split-out loader `pcall(require, "workspace-layouts")` in [`~/.config/hypr/hyprland.lua`](file:///home/vicky/.config/hypr/hyprland.lua) so that all persistent rules load automatically on boot.
-  - Bound <kbd>Super</kbd> + <kbd>S</kbd> in [`~/.config/hypr/keybinds.lua`](file:///home/vicky/.config/hypr/keybinds.lua).
-  - Added <kbd>Super</kbd> + <kbd>S</kbd> to the live cheatsheet in [`~/.config/quickshell/KeybindsWindow.qml`](file:///home/vicky/.config/quickshell/KeybindsWindow.qml).
+  - Bound <kbd>Super</kbd> + <kbd>L</kbd> in [`~/.config/hypr/keybinds.lua`](file:///home/vicky/.config/hypr/keybinds.lua).
+  - Added <kbd>Super</kbd> + <kbd>L</kbd> to the live cheatsheet in [`~/.config/quickshell/KeybindsWindow.qml`](file:///home/vicky/.config/quickshell/KeybindsWindow.qml).
 - **Files Modified / Created**:
   - [`~/.config/hypr/scripts/toggle-workspace-layout.py`](file:///home/vicky/.config/hypr/scripts/toggle-workspace-layout.py)
   - [`~/.config/hypr/workspace-layouts.lua`](file:///home/vicky/.config/hypr/workspace-layouts.lua)
@@ -387,6 +387,27 @@ When you run `./install.sh`:
   - [`~/.config/hypr/keybinds.lua`](file:///home/vicky/.config/hypr/keybinds.lua)
   - [`~/.config/quickshell/KeybindsWindow.qml`](file:///home/vicky/.config/quickshell/KeybindsWindow.qml)
   - [`~/Tegmentum-OS/README.md`](file:///home/vicky/Tegmentum-OS/README.md)
+
+---
+
+## 24. Arrow-Key Navigation, Super+L Layout Manager, Floating Window Alt-Tab Fix & Window Resizing
+- **Goal**:
+  1. Window Navigation: Pure arrow-key window focus and movement (<kbd>Super</kbd> + <kbd>←/→/↑/↓</kbd> and <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>←/→/↑/↓</kbd>), removing vim keys (<kbd>H</kbd>/<kbd>J</kbd>/<kbd>K</kbd>/<kbd>L</kbd>).
+  2. Layout Management: Rebind persistent workspace layout toggle to <kbd>Super</kbd> + <kbd>L</kbd>.
+  3. Floating Windows Focus & Elevation Fix: Fix floating windows not focusing or coming up when cycling with <kbd>Alt</kbd> + <kbd>Tab</kbd>.
+  4. Window Resizing Keybinds: Full standard (50px) and fine-grained (10px) width and height resizing via <kbd>+</kbd> and <kbd>-</kbd>.
+- **Root Cause & Fix for Floating Focus**:
+  - Previous configuration ran `hyprctl dispatch bringactivetotop`, which is deprecated and unsupported in modern Hyprland Lua, causing a dispatch error every cycle.
+  - Replaced with native Lua dispatchers `hl.dsp.window.alter_zorder({ mode = "top" })` and `hl.dsp.window.bring_to_top()` combined with a 25ms one-shot timer (`hl.timer`) to ensure floating windows rise to the top reliably.
+  - Fixed reverse cycling argument from `next = false` to Hyprland's native `forward = false`.
+- **Window Resizing Specifications**:
+  - Width standard (50px): <kbd>Super</kbd> + <kbd>+</kbd> (expand) / <kbd>-</kbd> (shrink)
+  - Height standard (50px): <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>+</kbd> (expand) / <kbd>-</kbd> (shrink)
+  - Width precise (10px): <kbd>Super</kbd> + <kbd>Alt</kbd> + <kbd>+</kbd> (expand) / <kbd>-</kbd> (shrink)
+  - Height precise (10px): <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>+</kbd> (expand) / <kbd>-</kbd> (shrink)
+  - Full keypad support (`KP_Add`, `KP_Subtract`) and symbol variations (`=`, `+`, `-`, `_`) with `{ repeating = true }`.
+- **Cheatsheet Sync**:
+  - Updated [`~/.config/quickshell/KeybindsWindow.qml`](file:///home/vicky/.config/quickshell/KeybindsWindow.qml) database to display all updated navigation and sizing bindings.
 
 
 

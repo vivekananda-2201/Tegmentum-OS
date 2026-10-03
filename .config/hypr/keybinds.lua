@@ -26,14 +26,12 @@ hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = 0 })) -- Fullscreen
 
 hl.bind(mainMod .. " + O", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/opacity.sh")) -- Opacity
 
--- Toggle workspace layout between dwindle and scrolling (persistent per workspace)
+-- Toggle workspace layout between dwindle and scrolling per workspace (persistent)
 hl.bind(
-	mainMod .. " + S",
+	mainMod .. " + L",
 	hl.dsp.exec_cmd("python3 " .. home .. "/.config/hypr/scripts/toggle-workspace-layout.py"),
 	{ description = "Toggle workspace layout (dwindle / scrolling)" }
 )
-
--- hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("python3 " .. home .. "/.config/43pr/bin/theme.py toggle")) -- Light/dark toggle
 
 -- Mouse move/resize window
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
@@ -140,28 +138,81 @@ end, { repeating = true })
 -- dispatcher call when moving to Lua.
 hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exit())
 
--- Focus (H/J/L/Up = left/down/right/up)
-hl.bind(mainMod .. " + H", hl.dsp.focus({ direction = "left" }))
-hl.bind(mainMod .. " + J", hl.dsp.focus({ direction = "down" }))
--- hl.bind(mainMod .. " + K", hl.dsp.focus({ direction = "up" })) -- Rebound to Keybindings Cheatsheet (SUPER + K)
-hl.bind(mainMod .. " + Up", hl.dsp.focus({ direction = "up" }))
-hl.bind(mainMod .. " + L", hl.dsp.focus({ direction = "right" }))
+local function raiseActive()
+	-- Bring the currently focused window to the top of the z-order stack.
+	-- Native Hyprland Lua dispatchers ensure floating windows properly come to top.
+	hl.dispatch(hl.dsp.window.alter_zorder({ mode = "top" }))
+	hl.dispatch(hl.dsp.window.bring_to_top())
+end
 
--- VERIFY: move active window within layout (old `movewindow` dispatcher).
--- Confirmed pattern is hl.dsp.window.move({ workspace = N }) for sending to a
--- workspace (used below) - the direction-swap variant isn't shown in the
--- official example, so double check this fires like the old movewindow did.
-hl.bind(mainMod .. " + SHIFT + H", hl.dsp.window.move({ direction = "left" }))
-hl.bind(mainMod .. " + SHIFT + J", hl.dsp.window.move({ direction = "down" }))
-hl.bind(mainMod .. " + SHIFT + K", hl.dsp.window.move({ direction = "up" }))
-hl.bind(mainMod .. " + SHIFT + L", hl.dsp.window.move({ direction = "right" }))
+local function focusAndRaise(dispatcher)
+	hl.dispatch(dispatcher)
+	raiseActive()
+	hl.timer(function()
+		raiseActive()
+	end, { timeout = 25, type = "oneshot" })
+end
 
--- VERIFY: resize active window by pixel delta (old `resizeactive`, repeating
--- while held via `binde`). Param names guessed as x/y - confirm with hyprctl eval.
-hl.bind(mainMod .. " + CTRL + H", hl.dsp.window.resize({ x = -40, y = 0 }), { repeating = true })
-hl.bind(mainMod .. " + CTRL + L", hl.dsp.window.resize({ x = 40, y = 0 }), { repeating = true })
-hl.bind(mainMod .. " + CTRL + K", hl.dsp.window.resize({ x = 0, y = -40 }), { repeating = true })
-hl.bind(mainMod .. " + CTRL + J", hl.dsp.window.resize({ x = 0, y = 40 }), { repeating = true })
+-- Window Focus / Navigation (Arrow Keys)
+hl.bind(mainMod .. " + Left", function()
+	focusAndRaise(hl.dsp.focus({ direction = "left" }))
+end, { description = "Focus window left" })
+
+hl.bind(mainMod .. " + Right", function()
+	focusAndRaise(hl.dsp.focus({ direction = "right" }))
+end, { description = "Focus window right" })
+
+hl.bind(mainMod .. " + Up", function()
+	focusAndRaise(hl.dsp.focus({ direction = "up" }))
+end, { description = "Focus window up" })
+
+hl.bind(mainMod .. " + Down", function()
+	focusAndRaise(hl.dsp.focus({ direction = "down" }))
+end, { description = "Focus window down" })
+
+-- Move active window within layout (Arrow Keys)
+hl.bind(mainMod .. " + SHIFT + Left", hl.dsp.window.move({ direction = "left" }), { description = "Move window left" })
+hl.bind(mainMod .. " + SHIFT + Right", hl.dsp.window.move({ direction = "right" }), { description = "Move window right" })
+hl.bind(mainMod .. " + SHIFT + Up", hl.dsp.window.move({ direction = "up" }), { description = "Move window up" })
+hl.bind(mainMod .. " + SHIFT + Down", hl.dsp.window.move({ direction = "down" }), { description = "Move window down" })
+
+----------------------------------------------------------------
+-- Window Resizing (Width & Height, Standard 50px & Precise 10px)
+----------------------------------------------------------------
+
+-- Standard width resize: Super + [+] expand, Super + [-] shrink (50px)
+hl.bind(mainMod .. " + equal", hl.dsp.window.resize({ x = 50, y = 0 }), { repeating = true, description = "Expand window width (50px)" })
+hl.bind(mainMod .. " + plus", hl.dsp.window.resize({ x = 50, y = 0 }), { repeating = true })
+hl.bind(mainMod .. " + KP_Add", hl.dsp.window.resize({ x = 50, y = 0 }), { repeating = true })
+
+hl.bind(mainMod .. " + minus", hl.dsp.window.resize({ x = -50, y = 0 }), { repeating = true, description = "Shrink window width (50px)" })
+hl.bind(mainMod .. " + KP_Subtract", hl.dsp.window.resize({ x = -50, y = 0 }), { repeating = true })
+
+-- Standard height resize: Super + Shift + [+] expand, Super + Shift + [-] shrink (50px)
+hl.bind(mainMod .. " + SHIFT + equal", hl.dsp.window.resize({ x = 0, y = 50 }), { repeating = true, description = "Expand window height (50px)" })
+hl.bind(mainMod .. " + SHIFT + plus", hl.dsp.window.resize({ x = 0, y = 50 }), { repeating = true })
+hl.bind(mainMod .. " + SHIFT + KP_Add", hl.dsp.window.resize({ x = 0, y = 50 }), { repeating = true })
+
+hl.bind(mainMod .. " + SHIFT + minus", hl.dsp.window.resize({ x = 0, y = -50 }), { repeating = true, description = "Shrink window height (50px)" })
+hl.bind(mainMod .. " + SHIFT + underscore", hl.dsp.window.resize({ x = 0, y = -50 }), { repeating = true })
+hl.bind(mainMod .. " + SHIFT + KP_Subtract", hl.dsp.window.resize({ x = 0, y = -50 }), { repeating = true })
+
+-- Precise width resize: Super + Alt + [+] expand, Super + Alt + [-] shrink (10px)
+hl.bind(mainMod .. " + ALT + equal", hl.dsp.window.resize({ x = 10, y = 0 }), { repeating = true, description = "Precise expand window width (10px)" })
+hl.bind(mainMod .. " + ALT + plus", hl.dsp.window.resize({ x = 10, y = 0 }), { repeating = true })
+hl.bind(mainMod .. " + ALT + KP_Add", hl.dsp.window.resize({ x = 10, y = 0 }), { repeating = true })
+
+hl.bind(mainMod .. " + ALT + minus", hl.dsp.window.resize({ x = -10, y = 0 }), { repeating = true, description = "Precise shrink window width (10px)" })
+hl.bind(mainMod .. " + ALT + KP_Subtract", hl.dsp.window.resize({ x = -10, y = 0 }), { repeating = true })
+
+-- Precise height resize: Super + Shift + Alt + [+] expand, Super + Shift + Alt + [-] shrink (10px)
+hl.bind(mainMod .. " + SHIFT + ALT + equal", hl.dsp.window.resize({ x = 0, y = 10 }), { repeating = true, description = "Precise expand window height (10px)" })
+hl.bind(mainMod .. " + SHIFT + ALT + plus", hl.dsp.window.resize({ x = 0, y = 10 }), { repeating = true })
+hl.bind(mainMod .. " + SHIFT + ALT + KP_Add", hl.dsp.window.resize({ x = 0, y = 10 }), { repeating = true })
+
+hl.bind(mainMod .. " + SHIFT + ALT + minus", hl.dsp.window.resize({ x = 0, y = -10 }), { repeating = true, description = "Precise shrink window height (10px)" })
+hl.bind(mainMod .. " + SHIFT + ALT + underscore", hl.dsp.window.resize({ x = 0, y = -10 }), { repeating = true })
+hl.bind(mainMod .. " + SHIFT + ALT + KP_Subtract", hl.dsp.window.resize({ x = 0, y = -10 }), { repeating = true })
 
 -- Workspaces 1-10, and move-to-workspace with SHIFT (confirmed pattern from
 -- the official example config)
@@ -207,19 +258,6 @@ hl.bind("switch:off:Lid Switch", hl.dsp.exec_cmd(lidScript .. " open"), { locked
 
 local moveStep = 40
 
-local function raiseActive()
-	-- Bring the currently focused window to the top.
-	-- The small delay makes it more reliable after cycling/focusing.
-	-- If it feels laggy, replace it with:
-	-- hl.dispatch(hl.dsp.exec_cmd("hyprctl dispatch bringactivetotop"))
-	hl.dispatch(hl.dsp.exec_cmd("sleep 0.02 && hyprctl dispatch bringactivetotop"))
-end
-
-local function focusAndRaise(dispatcher)
-	hl.dispatch(dispatcher)
-	raiseActive()
-end
-
 ----------------------------------------------------------------
 -- Window focus cycling (Alt-Tab)
 ----------------------------------------------------------------
@@ -231,7 +269,7 @@ end, { description = "Cycle to next window" })
 
 -- Previous window
 hl.bind("ALT + SHIFT + Tab", function()
-	focusAndRaise(hl.dsp.window.cycle_next({ next = false }))
+	focusAndRaise(hl.dsp.window.cycle_next({ forward = false }))
 end, { description = "Cycle to previous window" })
 
 ----------------------------------------------------------------
@@ -245,7 +283,7 @@ end, { description = "Next floating window" })
 
 -- Previous floating window
 hl.bind("ALT + SHIFT + GRAVE", function()
-	focusAndRaise(hl.dsp.window.cycle_next({ floating = true, next = false }))
+	focusAndRaise(hl.dsp.window.cycle_next({ floating = true, forward = false }))
 end, { description = "Previous floating window" })
 
 -- Jump directly to a floating window
@@ -254,67 +292,35 @@ hl.bind("ALT + F", function()
 end, { description = "Focus floating window" })
 
 ----------------------------------------------------------------
--- Move Floating Window (Arrow Keys + Vim Keys)
+-- Move Floating Window (Arrow Keys)
 ----------------------------------------------------------------
 
 -- LEFT
 hl.bind(
 	mainMod .. " + ALT + CTRL + left",
 	hl.dsp.window.move({ x = -moveStep, y = 0, relative = true }),
-	{ repeating = true },
-	{ description = "Move floating window left" }
-)
-
-hl.bind(
-	mainMod .. " + ALT + CTRL + H",
-	hl.dsp.window.move({ x = -moveStep, y = 0, relative = true }),
-	{ repeating = true },
-	{ description = "Move floating window left" }
+	{ repeating = true, description = "Move floating window left" }
 )
 
 -- RIGHT
 hl.bind(
 	mainMod .. " + ALT + CTRL + right",
 	hl.dsp.window.move({ x = moveStep, y = 0, relative = true }),
-	{ repeating = true },
-	{ description = "Move floating window right" }
-)
-
-hl.bind(
-	mainMod .. " + ALT + CTRL + L",
-	hl.dsp.window.move({ x = moveStep, y = 0, relative = true }),
-	{ repeating = true },
-	{ description = "Move floating window right" }
+	{ repeating = true, description = "Move floating window right" }
 )
 
 -- UP
 hl.bind(
 	mainMod .. " + ALT + CTRL + up",
 	hl.dsp.window.move({ x = 0, y = -moveStep, relative = true }),
-	{ repeating = true },
-	{ description = "Move floating window up" }
-)
-
-hl.bind(
-	mainMod .. " + ALT + CTRL + K",
-	hl.dsp.window.move({ x = 0, y = -moveStep, relative = true }),
-	{ repeating = true },
-	{ description = "Move floating window up" }
+	{ repeating = true, description = "Move floating window up" }
 )
 
 -- DOWN
 hl.bind(
 	mainMod .. " + ALT + CTRL + down",
 	hl.dsp.window.move({ x = 0, y = moveStep, relative = true }),
-	{ repeating = true },
-	{ description = "Move floating window down" }
-)
-
-hl.bind(
-	mainMod .. " + ALT + CTRL + J",
-	hl.dsp.window.move({ x = 0, y = moveStep, relative = true }),
-	{ repeating = true },
-	{ description = "Move floating window down" }
+	{ repeating = true, description = "Move floating window down" }
 )
 
 ----------------------------------------------------------------
