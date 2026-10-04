@@ -1,3 +1,4 @@
+//@ pragma UseQApplication
 import Quickshell
 
 // config/quickshell/shell.qml
@@ -15,4 +16,3 @@ ShellRoot {
     PowerMenu {}
     Bar {}
 }
-
