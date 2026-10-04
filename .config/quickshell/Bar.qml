@@ -123,6 +123,7 @@ Scope {
         property bool bold: false
         property bool hoverGrow: false
         property real yOffset: 0
+        readonly property bool hovered: ma.containsMouse
         signal clicked(var mouse)
         signal scrolled(real delta)
 
@@ -470,11 +471,21 @@ Scope {
 
             // ===== RIGHT =====
             Rectangle {
+                id: rightPanel
                 anchors { right: parent.right; top: parent.top; rightMargin: 6; topMargin: 4 }
                 height: 20
                 width: rightRow.implicitWidth + 4
                 radius: Theme.radius
                 color: Theme.bg
+
+                HoverHandler { id: rightHover }
+
+                readonly property bool isHovered: rightHover.hovered
+                    || (volMod && volMod.hovered)
+                    || (netMod && netMod.hovered)
+                    || (batMod && batMod.hovered)
+                    || (pwrMod && pwrMod.hovered)
+                    || (trayComp && trayComp.hovered)
 
                 Row {
                     id: rightRow
@@ -538,8 +549,17 @@ Scope {
                         }
                     }
 
+                    // System Tray (collapsible, left of volume)
+                    Tray {
+                        id: trayComp
+                        barWindow: bar
+                        isRightBarHovered: rightPanel.isHovered
+                        iconYOffset: root.iconYOffset
+                    }
+
                     // Volume
                     Mod {
+                        id: volMod
                         readonly property var sink: Pipewire.defaultAudioSink
                         readonly property real vol: sink && sink.audio ? sink.audio.volume : 0
                         readonly property bool muted: sink && sink.audio ? sink.audio.muted : false
@@ -567,6 +587,7 @@ Scope {
 
                     // Network (nf-md wifi / ethernet / wifi_off)
                     Mod {
+                        id: netMod
                         baseSize: 13
                         yOffset: root.iconYOffset
                         text: root.netState === "wifi" ? "\uDB81\uDDA9"
@@ -576,6 +597,7 @@ Scope {
 
                     // Battery (hidden unless a laptop battery exists)
                     Mod {
+                        id: batMod
                         visible: root.battery !== null
                         baseSize: 12
                         text: (root.batCharging ? "\uf0e7 " : "") + root.batIcon + "  " + root.batPct + "%"
@@ -584,6 +606,7 @@ Scope {
 
                     // Power
                     Mod {
+                        id: pwrMod
                         baseSize: 15
                         hoverGrow: false
                         yOffset: root.iconYOffset
