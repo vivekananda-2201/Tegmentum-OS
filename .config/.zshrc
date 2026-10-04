@@ -1,10 +1,20 @@
 eval "$(starship init zsh)"
 
-# Listing
-alias ls='ls -a --color=auto'
-alias ll='ls -lah --color=auto'
-alias la='ls -A --color=auto'
-alias l='ls -CF -a --color=auto'
+# Listing (eza with icons and grouped directories to match user setup)
+if command -v eza &>/dev/null; then
+  alias ls='eza -l --icons=always --group-directories-first'
+  alias ll='eza -la --icons=always --group-directories-first'
+  alias la='eza -a --icons=always --group-directories-first'
+  alias l='eza -l --icons=always --group-directories-first'
+else
+  alias ls='ls --color=auto'
+  alias ll='ls -lah --color=auto'
+  alias la='ls -A --color=auto'
+  alias l='ls -CF --color=auto'
+fi
+
+# Clear screen and entire terminal scrollback buffer completely
+alias clear="printf '\033[2J\033[3J\033[H'"
 
 
 # --------------------------------------------------

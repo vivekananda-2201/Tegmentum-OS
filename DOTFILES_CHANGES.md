@@ -428,22 +428,37 @@ When you run `./install.sh`:
 
 ---
 
-## 26. Terminal Listing Aliases with Hidden & Classified Files Support
-- **Goal**: Standardize directory listing commands in shell configurations (`~/.zshrc` and `~/.bashrc`) with color output, classification indicators, and visibility of hidden dotfiles across all commands.
-- **Aliases Configured**:
+## 26. Modern Directory Listing with `eza` (Icons, Permissions, Grouped Directories)
+- **Goal**: Match the user's secondary laptop terminal setup where `ls` displays rich formatted output with file permissions (`drwxr-xr-x`, `.rw-r--r--`), human-readable sizes (`1.4k`, `-`), owner user, date, Nerd Font icons, and directories grouped first.
+- **Aliases Configured** (in `~/.zshrc`, `~/.bashrc`, and `~/Tegmentum-OS/.config/.zshrc`):
   ```bash
-  # Listing
-  alias ls='ls -a --color=auto'
-  alias ll='ls -lah --color=auto'
-  alias la='ls -A --color=auto'
-  alias l='ls -CF -a --color=auto'
+  # Listing (using eza with icons and grouped directories to match user setup)
+  if command -v eza &>/dev/null; then
+    alias ls='eza -l --icons=always --group-directories-first'
+    alias ll='eza -la --icons=always --group-directories-first'
+    alias la='eza -a --icons=always --group-directories-first'
+    alias l='eza -l --icons=always --group-directories-first'
+  else
+    alias ls='ls --color=auto'
+    alias ll='ls -lah --color=auto'
+    alias la='ls -A --color=auto'
+    alias l='ls -CF --color=auto'
+  fi
   ```
 - **Files Modified**:
   - [`~/.zshrc`](file:///home/vicky/.zshrc)
   - [`~/.bashrc`](file:///home/vicky/.bashrc)
   - [`~/Tegmentum-OS/.config/.zshrc`](file:///home/vicky/Tegmentum-OS/.config/.zshrc)
 
+---
 
-
-
-
+## 27. Terminal Scrollback Buffer Purging on `clear` & <kbd>Ctrl</kbd> + <kbd>L</kbd>
+- **Goal**: When running `clear` (or pressing <kbd>Ctrl</kbd> + <kbd>L</kbd>), completely wipe the screen and flush the terminal scrollback history so scrolling up reveals no residual previous output.
+- **Root Cause**: Modern terminal emulators like Kitty only erase the visible viewport when receiving standard ANSI `\033[H\033[2J`, pushing lines into scrollback buffer. Kitty's default terminfo was also missing the `E3` (`\E[3J`) capability, so `/usr/bin/clear` did not clear the scrollback buffer.
+- **Implementation**:
+  1. **Shell Alias**: Added `alias clear="printf '\033[2J\033[3J\033[H'"` in both `~/.zshrc` and `~/.bashrc`.
+  2. **Kitty Configuration**: Added shortcut to [`~/.config/kitty/kitty.conf`](file:///home/vicky/.config/kitty/kitty.conf) and [`~/Tegmentum-OS/.config/kitty/kitty.conf`](file:///home/vicky/Tegmentum-OS/.config/kitty/kitty.conf):
+     ```conf
+     map ctrl+l combine : clear_terminal scrollback active : send_text normal,application \x0c
+     ```
+  3. **Terminfo Enhancement**: Compiled `E3=\E[3J,` capability into `~/.terminfo/x/xterm-kitty` so even raw `/usr/bin/clear` invocations in subshells emit `^[[H^[[2J^[[3J`.
