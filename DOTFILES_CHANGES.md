@@ -462,3 +462,35 @@ When you run `./install.sh`:
      map ctrl+l combine : clear_terminal scrollback active : send_text normal,application \x0c
      ```
   3. **Terminfo Enhancement**: Compiled `E3=\E[3J,` capability into `~/.terminfo/x/xterm-kitty` so even raw `/usr/bin/clear` invocations in subshells emit `^[[H^[[2J^[[3J`.
+
+---
+
+## 28. Native Quickshell Desktop Suite: Top Bar, Notifications & Power Menu
+- **Goal**: Transition from multi-daemon GTK3/standalone tools (Waybar, Dunst, wlogout/Rofi powermenu) to an all-in-one native Quickshell desktop architecture with zero accidental mouse hover triggers.
+- **Components Installed & Configured**:
+  1. **Top Status Bar (`Bar.qml` & `Marquee.qml`)**:
+     - Floating pill island layout with animated workspaces, CPU/RAM delta calculations directly from `/proc` without subshells, scrolling MPRIS media player marquee (`Marquee.qml`), native PipeWire volume scrolling, and dynamic laptop battery detection.
+     - **Mouse Hover Fixes**:
+       - Completely excluded `SettingsCornerTrigger.qml` (invisible 10px screen edge hot-zones).
+       - Converted the calendar popup from hover-triggered to click-to-toggle (`onClicked: calOpen = !calOpen`) so moving the mouse past the top bar never pops open the calendar unexpectedly.
+       - Disabled module font expansion on hover (`hoverGrow = false`) to eliminate bar pill resizing/jittering when cursor sweeps across.
+     - Toggled with <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>Space</kbd> (`qs ipc call bar toggle`).
+  2. **Notification System (`Notifications.qml`)**:
+     - Built-in Freedesktop notification daemon server (`NotificationServer`) replacing Dunst.
+     - Slide-in toast notifications with action buttons and critical alert highlights.
+     - Full persistent Notification Center drawer toggled via <kbd>Super</kbd> + <kbd>N</kbd> (`qs ipc call notifications toggle`), saving up to 100 historical alerts across reboots in `~/.cache/43pr/notifications.json`.
+     - Built-in battery low (<=20%) and critical (<=15%) alerts.
+  3. **Power Menu (`PowerMenu.qml`)**:
+     - Native Quickshell overlay replacing `powermenu.sh` / `wlogout` with instantaneous (<5ms) invocation.
+     - Actions: Lock (<kbd>L</kbd> -> `hyprlock`), Shut down (<kbd>S</kbd>), Reboot (<kbd>R</kbd>), Suspend (<kbd>Z</kbd>), Log out (<kbd>E</kbd>), Hibernate (<kbd>H</kbd>).
+     - Interactive in-menu customizer (<kbd>C</kbd>) for live drag-and-drop repositioning and scaling (70% to 150%).
+     - Toggled with <kbd>Super</kbd> + <kbd>Escape</kbd> or <kbd>Super</kbd> + <kbd>`</kbd> (`qs ipc call powermenu toggle`).
+  4. **Preserved Custom Components**:
+     - Preserved `BrightnessOsd.qml` and `KeybindsWindow.qml` (<kbd>Super</kbd> + <kbd>K</kbd>) in `shell.qml`.
+     - Preserved all Hyprland window navigation, sizing, and persistent per-workspace layout controls.
+- **Files Modified / Added**:
+  - Added: `~/.config/quickshell/Bar.qml`, `Marquee.qml`, `Notifications.qml`, `PowerMenu.qml`, `imgs/`
+  - Modified: `~/.config/quickshell/shell.qml`, `~/.config/quickshell/Theme.qml`, `~/.config/quickshell/KeybindsWindow.qml`
+  - Modified: `~/.config/hypr/hyprland.lua` (disabled `waybar` and `dunst` autostart)
+  - Modified: `~/.config/hypr/keybinds.lua` (rebound power menu, bar toggle, added notifications)
+  - Synced to all tracked files in `~/Tegmentum-OS/`.

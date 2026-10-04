@@ -11,5 +11,8 @@ ShellRoot {
     ScreenshotOsd {}
     SettingsWindow {}
     KeybindsWindow {}
+    Notifications {}
+    PowerMenu {}
+    Bar {}
 }
 

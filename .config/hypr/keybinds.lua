@@ -15,10 +15,12 @@ hl.bind(mainMod .. " + W", hl.dsp.window.close())
 
 hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd("hyprlock")) -- Lock screen
 
-hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/powermenu.sh"), { description = "Power menu" })
+hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("qs ipc call powermenu toggle"), { description = "Power menu" })
+hl.bind(mainMod .. " + GRAVE", hl.dsp.exec_cmd("qs ipc call powermenu toggle"), { description = "Power menu" })
 
 hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("qs ipc call settings toggle")) -- Settings
 hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("qs ipc call keybinds toggle")) -- Keybindings Cheatsheet
+hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("qs ipc call notifications toggle"), { description = "Notifications" }) -- Notifications
 
 hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("qs -n -p ~/.config/quickshell/hyprquickpaper")) -- Wallpapers
 
@@ -45,10 +47,11 @@ hl.bind(
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
--- Toggle waybar
+-- Toggle top bar
 hl.bind(
 	mainMod .. " + SHIFT + Space",
-	hl.dsp.exec_cmd("sh -c 'pgrep -x waybar >/dev/null && pkill waybar || nohup waybar >/dev/null 2>&1 &'")
+	hl.dsp.exec_cmd("qs ipc call bar toggle"),
+	{ description = "Toggle top bar" }
 )
 
 -- Clipboard
