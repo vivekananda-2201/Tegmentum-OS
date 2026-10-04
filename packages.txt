@@ -1,4 +1,4 @@
-# 43PR/dotfiles
+# Tegmentum-OS
 # Install e.g.: sudo pacman -S cava
 # Remove e.g.: sudo pacman -R cava
 

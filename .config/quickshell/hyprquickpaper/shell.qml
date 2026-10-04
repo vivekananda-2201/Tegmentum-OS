@@ -100,7 +100,7 @@ PanelWindow {
     }
 
     FileView {
-        path: Qt.resolvedUrl(Quickshell.env("HOME") + "/.local/state/43pr/state.json")
+        path: Qt.resolvedUrl(Quickshell.env("HOME") + "/.local/state/tegmentum/state.json")
         watchChanges: false
         printErrors: false
         onLoaded: {

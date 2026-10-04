@@ -86,5 +86,5 @@ ZSH_HIGHLIGHT_STYLES[comment]='fg=240'
 ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=245'
 
 
-# 43PR theme controller
-theme() { python3 "$HOME/.config/43pr/bin/theme.py" "$@"; }
+# Tegmentum theme controller
+theme() { python3 "$HOME/.config/tegmentum/bin/theme.py" "$@"; }

@@ -598,14 +598,14 @@ Selecting and applying a wallpaper does far more than change a background imageâ
 flowchart LR
     A["Select Wallpaper (hyprquickpaper)"] --> B["~/.config/hypr/scripts/wallpaper.sh"]
     B --> C["swww img (Smooth Fade Transition)"]
-    B --> D["~/.config/43pr/bin/theme.py"]
+    B --> D["~/.config/tegmentum/bin/theme.py"]
     D --> E["Matugen (Material You Engine)"]
-    E --> F["~/.config/43pr/targets.toml"]
+    E --> F["~/.config/tegmentum/targets.toml"]
     F --> G["Kitty Terminal (~/.config/kitty/themes/43pr.conf)"]
     F --> H["Quickshell Theme (~/.config/quickshell/Theme.qml)"]
     F --> I["GTK 3/4 CSS Variables (~/.config/gtk-3.0/gtk.css)"]
     F --> J["Rofi Colors (~/.config/rofi/colors.rasi)"]
-    F --> K["btop System Monitor (~/.config/btop/themes/43pr.theme)"]
+    F --> K["btop System Monitor (~/.config/btop/themes/tegmentum.theme)"]
 ```
 
 1. `wallpaper.sh` writes the image path to `~/.config/hypr/current_wallpaper` and updates the Wayland backdrop via `swww`.
@@ -613,7 +613,7 @@ flowchart LR
 3. Matugen applies Google's Material You color science:
    - Identifies the dominant tonal palette.
    - Extracts semantic tokens: Primary accent (`accent`), secondary highlight (`accent2`), surface background (`bg`), foreground text (`fg`), and container boundaries (`border`).
-4. Template files in `~/.config/43pr/templates/` are evaluated against these tokens and written to target files across the entire OS, broadcasting color updates live without requiring system restarts.
+4. Template files in `~/.config/tegmentum/templates/` are evaluated against these tokens and written to target files across the entire OS, broadcasting color updates live without requiring system restarts.
 
 ---
 
@@ -1690,7 +1690,7 @@ Upstream v1.2.0 dismantled this patchwork and consolidated the entire desktop in
 2. **Native Notification System (`Notifications.qml`):**
    - Directly registers on the system D-Bus as `org.freedesktop.Notifications`, completely deprecating Dunst.
    - Beautiful cubic slide-in toast popups beneath the top bar with clickable action buttons.
-   - A full-featured **Notification Center drawer** toggled via <kbd>Super</kbd> + <kbd>N</kbd>, saving up to 100 historical notifications across reboots in `~/.cache/43pr/notifications.json`.
+   - A full-featured **Notification Center drawer** toggled via <kbd>Super</kbd> + <kbd>N</kbd>, saving up to 100 historical notifications across reboots in `~/.cache/tegmentum/notifications.json`.
    - Built-in battery sentinels automatically issuing desktop alerts when battery hits <= 20% (Low) and <= 15% (Critical).
 
 3. **Fluid Power Menu (`PowerMenu.qml`):**
@@ -1874,7 +1874,7 @@ With Dunst deactivated, `Notifications.qml` became the system's official Freedes
   hl.bind({ mods = { "SUPER" }, key = "n", dispatcher = "exec", args = { "qs ipc call notifications toggle" } })
   ```
   Pressing <kbd>Super</kbd> + <kbd>N</kbd> opens a full-height dark drawer on the right edge of the monitor, displaying all past notifications.
-- **Cross-Reboot Persistence:** Notifications are serialized asynchronously with a 300ms debounce directly to `~/.cache/43pr/notifications.json`. Dismissed alerts or whole-history clears ("Clear All") synchronize immediately.
+- **Cross-Reboot Persistence:** Notifications are serialized asynchronously with a 300ms debounce directly to `~/.cache/tegmentum/notifications.json`. Dismissed alerts or whole-history clears ("Clear All") synchronize immediately.
 - **Laptop Battery Sentinels:** The daemon queries `UPower` continuously. If the battery drops to 20% while discharging, a warning toast appears. If it drops to 15%, a persistent critical notification flashes red with audible alert cues.
 
 The migration was clean, comprehensive, and perfectly aligned with Vivekananda's ergonomic vision.
@@ -1905,17 +1905,17 @@ Antigravity audited `~/.config/btop/btop.conf` and the 43PR theming engine:
    `btop` was hardcoded to read the static `greyscale.theme` file shipped with the package, ignoring system palette updates entirely. Furthermore, `theme_background = true` forced `btop` to paint an opaque background surface, obstructing Kitty's blur and translucent backdrop.
 
 2. **The Missing Target in `targets.toml`:**
-   Inspection of `~/.config/43pr/targets.toml` (which tells `theme.py` which applications to generate configurations for) revealed targets for Kitty, Quickshell, GTK, and Rofi, as well as dead hooks for retired tools (`waybar`, `wlogout`).
+   Inspection of `~/.config/tegmentum/targets.toml` (which tells `theme.py` which applications to generate configurations for) revealed targets for Kitty, Quickshell, GTK, and Rofi, as well as dead hooks for retired tools (`waybar`, `wlogout`).
    **There was no configuration entry for `btop`!**
 
 ---
 
 ### 11.2 Authoring `btop.theme` Template & `targets.toml` Integration
 
-To resolve this, Antigravity handcrafted a dedicated theming template at `~/.config/43pr/templates/btop.theme`:
+To resolve this, Antigravity handcrafted a dedicated theming template at `~/.config/tegmentum/templates/btop.theme`:
 
 ```ini
-# ~/.config/43pr/templates/btop.theme
+# ~/.config/tegmentum/templates/btop.theme
 # Dynamic Matugen Theme for btop
 
 # Main background, empty for terminal default, need to be also set in btop.conf
@@ -1991,12 +1991,12 @@ theme[upload_end]="{{colors.error.default.hex}}"
 ```
 
 #### Registering the Target in `targets.toml`
-In `~/.config/43pr/targets.toml`, Antigravity registered `btop` and cleaned out legacy daemons:
+In `~/.config/tegmentum/targets.toml`, Antigravity registered `btop` and cleaned out legacy daemons:
 ```toml
-# ~/.config/43pr/targets.toml
+# ~/.config/tegmentum/targets.toml
 [btop]
 template = "btop.theme"
-target = "~/.config/btop/themes/43pr.theme"
+target = "~/.config/btop/themes/tegmentum.theme"
 
 # PURGED OBSOLETE TARGETS:
 # [waybar]   -- Retired
@@ -2010,7 +2010,7 @@ target = "~/.config/btop/themes/43pr.theme"
 Finally, `~/.config/btop/btop.conf` was configured to activate the new theme and enable background pass-through:
 ```ini
 # ~/.config/btop/btop.conf
-color_theme = "43pr"
+color_theme = "tegmentum"
 theme_background = false
 ```
 
@@ -2019,7 +2019,7 @@ When `theme_background` is set to `false`, `btop` skips painting its own backgro
 #### The Visual Outcome
 Antigravity triggered `theme.py` against the active wallpaper.
 
-Instantly, `43pr.theme` was generated in `~/.config/btop/themes/`. Launching `btop` revealed a stunning transformation:
+Instantly, `tegmentum.theme` was generated in `~/.config/btop/themes/`. Launching `btop` revealed a stunning transformation:
 - Real-time CPU, RAM, and Network graphs rendered with luminous gradients precisely matching the dominant hues of the desktop artwork.
 - Process hierarchies and core utilization meters matched Kitty's syntax colors.
 - The entire interface blended seamlessly into Kitty's 0.90 opacity background blur, creating a unified, high-tech command center.
@@ -2080,7 +2080,7 @@ flowchart TD
         KITTY["Kitty Terminal (Block Cursor, 4px Padding, Scrollback Purge)"]
         EZA["Zsh + Starship (eza --icons=always --group-directories-first)"]
         CLEAR["Tri-Layer Clear (Shell Alias + Kitty Combine + E3 Terminfo)"]
-        BTOP["btop Resource Monitor (43pr.theme + Transparent Blending)"]
+        BTOP["btop Resource Monitor (tegmentum.theme + Transparent Blending)"]
         GTK["GTK 3 & 4 CSS (Pitch Black OLED #000000 + Subtle Blue Hover)"]
         WALL --> MATUGEN
         MATUGEN --> KITTY

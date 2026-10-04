@@ -1,5 +1,5 @@
-name = "43pr-default"
-description = "The original 43PR look, extracted from the repo"
+name = "tegmentum-default"
+description = "The default Tegmentum look"
 override = false   # true = wallpaper changes will NOT replace this preset
 
 [colors]

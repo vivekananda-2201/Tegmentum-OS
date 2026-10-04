@@ -1,4 +1,4 @@
-/* Power Menu Theme — matching 43PR Rofi aesthetic */
+/* Power Menu Theme — matching Tegmentum Rofi aesthetic */
 @import "colors.rasi"
 
 configuration {

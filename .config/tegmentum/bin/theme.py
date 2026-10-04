@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""43PR theme controller: presets + Matugen -> one semantic palette -> app files."""
+"""Tegmentum theme controller: presets + Matugen -> one semantic palette -> app files."""
 import argparse, colorsys, fcntl, json, os, re, shutil, subprocess, sys, tempfile, tomllib
 from contextlib import contextmanager
 from pathlib import Path
 
 HOME = Path.home()
 CFG = Path(os.environ.get("XDG_CONFIG_HOME", HOME / ".config"))
-CACHE = Path(os.environ.get("XDG_CACHE_HOME", HOME / ".cache")) / "43pr"
-STATE_DIR = Path(os.environ.get("XDG_STATE_HOME", HOME / ".local/state")) / "43pr"
-ROOT = CFG / "43pr"
+CACHE = Path(os.environ.get("XDG_CACHE_HOME", HOME / ".cache")) / "tegmentum"
+STATE_DIR = Path(os.environ.get("XDG_STATE_HOME", HOME / ".local/state")) / "tegmentum"
+ROOT = CFG / "tegmentum"
 THEMES = ROOT / "themes"
 TARGETS = ROOT / "targets.toml"
 MATUGEN_CFG = CFG / "matugen" / "config.toml"
@@ -33,7 +33,7 @@ def warn(msg):
 
 def atomic_write(path, text):
     path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_name(f".{path.name}.43pr-tmp")
+    tmp = path.with_name(f".{path.name}.tegmentum-tmp")
     tmp.write_text(text)
     os.replace(tmp, path)
 
@@ -79,7 +79,7 @@ def merged(colors):
 
 
 def preset_path(name):
-    if name == "43pr-default":
+    if name in ("tegmentum-default", "43pr-default", "default"):
         name = "default"
     if not NAME.match(name):
         die(f"invalid preset name: {name!r}")
@@ -211,7 +211,7 @@ def apply_palette(pal):
                 hooks.append(t["reload"])
         for f, dst in staged:                      # 2. only then replace files
             dst.parent.mkdir(parents=True, exist_ok=True)
-            tmp = dst.with_name(f".{dst.name}.43pr-tmp")
+            tmp = dst.with_name(f".{dst.name}.tegmentum-tmp")
             shutil.copyfile(f, tmp)
             os.replace(tmp, dst)
         atomic_write(PALETTE, json.dumps(pal, indent=2))
@@ -274,7 +274,7 @@ def cmd_preset(a):
             ensure_fallback()
             die(f"theme unchanged: {e}")
         st = load_state()
-        st.update(mode="preset", preset="default" if a.name == "43pr-default" else a.name)
+        st.update(mode="preset", preset="default" if a.name in ("tegmentum-default", "43pr-default") else a.name)
         save_state(st)
     print(f"theme: preset '{a.name}' applied")
 

@@ -39,7 +39,7 @@ QtObject {
     property var palette: ({})
 
     property FileView themeFile: FileView {
-        path: Qt.resolvedUrl(Quickshell.env("HOME") + "/.cache/43pr/quickshell-theme.json")
+        path: Qt.resolvedUrl(Quickshell.env("HOME") + "/.cache/tegmentum/quickshell-theme.json")
         watchChanges: true
         printErrors: false
         onFileChanged: reload()

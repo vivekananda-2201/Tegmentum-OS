@@ -8,7 +8,7 @@ import QtQuick
 // Notification daemon:
 //  - popups in the top-right corner
 //  - persistent history panel (toggle: qs ipc call notifications toggle)
-//  - history saved to ~/.cache/43pr/notifications.json
+//  - history saved to ~/.cache/tegmentum/notifications.json
 //  - battery low / critical alerts
 PanelWindow {
     id: root
@@ -97,7 +97,7 @@ PanelWindow {
 
     FileView {
         id: store
-        path: Quickshell.env("HOME") + "/.cache/43pr/notifications.json"
+        path: Quickshell.env("HOME") + "/.cache/tegmentum/notifications.json"
         printErrors: false
 
         onLoaded: {

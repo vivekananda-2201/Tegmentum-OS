@@ -17,7 +17,7 @@ Item {
 
         Quickshell.execDetached([
             "python3",
-            "/home/rp34/.config/43pr/bin/theme.py",
+            Quickshell.env("HOME") + "/.config/tegmentum/bin/theme.py",
             themeName
         ])
     }

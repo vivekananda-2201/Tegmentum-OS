@@ -2,7 +2,7 @@
 
 set -uo pipefail
 
-# 43PR/dotfiles installer
+# Tegmentum-OS installer
 # Arch-compatible Linux + Hyprland
 #
 # Usage:
@@ -333,7 +333,7 @@ success "Shell script permissions configured."
 
 if command -v python3 >/dev/null 2>&1; then
     info "Generating initial theme..."
-    python3 "$CONFIG_DIR/43pr/bin/theme.py" apply \
+    python3 "$CONFIG_DIR/tegmentum/bin/theme.py" apply \
         || warning "Initial theme generation failed."
 else
     warning "python3 not found; skipping initial theme generation. Configs will use the committed fallback colors until you install python3 and run 'theme apply'."
@@ -345,7 +345,7 @@ fi
 
 printf '\n'
 printf '\033[1;32m========================================\033[0m\n'
-printf '\033[1;32m       43PR Hyprland Setup Ready       \033[0m\n'
+printf '\033[1;32m   Tegmentum-OS Hyprland Setup Ready    \033[0m\n'
 printf '\033[1;32m========================================\033[0m\n'
 printf '\n'
 
