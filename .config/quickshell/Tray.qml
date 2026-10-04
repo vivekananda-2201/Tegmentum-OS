@@ -60,31 +60,116 @@ Item {
         return "image://icon/" + icon;
     }
 
+    // Find matching Hyprland toplevel window for an item
+    function findToplevel(item) {
+        if (!item) return null;
+        const toplevels = (Hyprland.toplevels && Hyprland.toplevels.values) ? Hyprland.toplevels.values : [];
+        if (!toplevels || toplevels.length === 0) return null;
+
+        const rawId = (item.id || "").toLowerCase();
+        const rawTitle = (item.title || "").toLowerCase();
+        const rawTooltip = (item.tooltipTitle || "").toLowerCase();
+
+        // 1. Embedded PID match (e.g. org.freedesktop.StatusNotifierItem-3822-1)
+        const pidMatch = (item.id || "").match(/-(\d+)-/);
+        if (pidMatch && pidMatch[1]) {
+            const targetPid = parseInt(pidMatch[1]);
+            const match = toplevels.find(t => {
+                const ipc = t.lastIpcObject || {};
+                return ipc.pid === targetPid && (ipc.mapped !== false) && !ipc.hidden;
+            });
+            if (match) return match;
+        }
+
+        // 2. Clean names
+        const cleanId = rawId.replace(/_status_icon.*$/, "").replace(/.*[\.\/]/, "").trim();
+        const cleanTitle = rawTitle.replace(/.*[\.\/]/, "").trim();
+
+        // 3. Search toplevels
+        return toplevels.find(t => {
+            const ipc = t.lastIpcObject || {};
+            const isVisible = (ipc.mapped !== false) && !ipc.hidden;
+            if (!isVisible) return false;
+
+            const c = String(ipc.class || "").toLowerCase();
+            const ic = String(ipc.initialClass || "").toLowerCase();
+            const tTitle = String(t.title || ipc.title || ipc.initialTitle || "").toLowerCase();
+
+            if (cleanId && cleanId.length > 2) {
+                if (c.includes(cleanId) || cleanId.includes(c)) return true;
+                if (ic.includes(cleanId) || cleanId.includes(ic)) return true;
+                if (tTitle.includes(cleanId)) return true;
+            }
+
+            if (cleanTitle && cleanTitle.length > 2) {
+                if (c.includes(cleanTitle) || cleanTitle.includes(c)) return true;
+                if (ic.includes(cleanTitle) || cleanTitle.includes(ic)) return true;
+                if (tTitle.includes(cleanTitle) || cleanTitle.includes(tTitle)) return true;
+            }
+
+            if (rawTooltip && rawTooltip.length > 2) {
+                if (tTitle.includes(rawTooltip) || rawTooltip.includes(tTitle)) return true;
+                if (c.includes(rawTooltip) || rawTooltip.includes(c)) return true;
+            }
+
+            if (rawId && rawId.length > 2) {
+                if (c.includes(rawId) || rawId.includes(c)) return true;
+                if (ic.includes(rawId) || rawId.includes(ic)) return true;
+            }
+
+            return false;
+        });
+    }
+
+    // Timer to focus newly opened window if app was previously minimized to tray
+    Timer {
+        id: focusNewWindowTimer
+        interval: 180
+        property var targetItem: null
+        onTriggered: {
+            if (targetItem) {
+                const toplevel = root.findToplevel(targetItem);
+                if (toplevel) {
+                    const ipc = toplevel.lastIpcObject || {};
+                    const ws = (ipc.workspace && ipc.workspace.name) ? ipc.workspace.name
+                             : (toplevel.workspace && toplevel.workspace.name) ? toplevel.workspace.name
+                             : (toplevel.workspace && toplevel.workspace.id) ? String(toplevel.workspace.id) : "";
+                    if (ws) {
+                        root.run("hyprctl dispatch 'hl.dsp.focus({workspace=\"" + ws + "\"})'");
+                    }
+                    root.run("hyprctl dispatch 'hl.dsp.focus({window=\"address:" + toplevel.address + "\"})'");
+                }
+                targetItem = null;
+            }
+        }
+    }
+
     // Activate item and focus Hyprland window/workspace
     function activateItem(item) {
         if (!item) return;
-        item.activate();
 
-        const id = (item.id || "").toLowerCase();
-        const title = (item.title || "").toLowerCase();
-
-        // Search for matching window in Hyprland
-        const toplevels = (Hyprland.toplevels && Hyprland.toplevels.values) ? Hyprland.toplevels.values : [];
-        const toplevel = toplevels.find(t => {
-            const ipc = t.lastIpcObject || {};
-            const c = String(ipc.class || "").toLowerCase();
-            const ic = String(ipc.initialClass || "").toLowerCase();
-            const tTitle = String(t.title || "").toLowerCase();
-            return (c && (id.includes(c) || c.includes(id)))
-                || (ic && (id.includes(ic) || ic.includes(id)))
-                || (title && (tTitle.includes(title) || title.includes(tTitle)));
-        });
+        const toplevel = root.findToplevel(item);
 
         if (toplevel) {
-            if (toplevel.workspace) {
-                toplevel.workspace.activate();
+            // App is ALREADY graphically open!
+            // Do NOT call item.activate() because DBus StatusNotifierItem toggles/minimizes the window!
+            const ipc = toplevel.lastIpcObject || {};
+            const ws = (ipc.workspace && ipc.workspace.name) ? ipc.workspace.name
+                     : (toplevel.workspace && toplevel.workspace.name) ? toplevel.workspace.name
+                     : (toplevel.workspace && toplevel.workspace.id) ? String(toplevel.workspace.id) : "";
+
+            if (ws) {
+                root.run("hyprctl dispatch 'hl.dsp.focus({workspace=\"" + ws + "\"})'");
             }
-            root.run("hyprctl dispatch focuswindow address:" + toplevel.address + " 2>/dev/null || hyprctl dispatch 'hl.dsp.focus({window=\"address:" + toplevel.address + "\"})'");
+            root.run("hyprctl dispatch 'hl.dsp.focus({window=\"address:" + toplevel.address + "\"})'");
+        } else {
+            // App is NOT graphically open (it is hidden/minimized to tray).
+            // Calling item.activate() will open/show its window!
+            item.activate();
+
+            // After unhiding, focus the window once mapped
+            focusNewWindowTimer.targetItem = item;
+            focusNewWindowTimer.restart();
         }
     }
 
@@ -92,22 +177,9 @@ Item {
     function terminateItem(item) {
         if (!item) return;
 
-        const id = (item.id || "").toLowerCase();
-        const title = (item.title || "").toLowerCase();
-
         // 1. Try finding exact PID from Hyprland toplevels
         let pid = null;
-        const toplevels = (Hyprland.toplevels && Hyprland.toplevels.values) ? Hyprland.toplevels.values : [];
-        const toplevel = toplevels.find(t => {
-            const ipc = t.lastIpcObject || {};
-            const c = String(ipc.class || "").toLowerCase();
-            const ic = String(ipc.initialClass || "").toLowerCase();
-            const tTitle = String(t.title || "").toLowerCase();
-            return (c && (id.includes(c) || c.includes(id)))
-                || (ic && (id.includes(ic) || ic.includes(id)))
-                || (title && (tTitle.includes(title) || title.includes(tTitle)));
-        });
-
+        const toplevel = root.findToplevel(item);
         if (toplevel && toplevel.lastIpcObject && toplevel.lastIpcObject.pid) {
             pid = toplevel.lastIpcObject.pid;
         }
@@ -123,8 +195,8 @@ Item {
         // 3. Fallback candidates for pkill
         let rawId = item.id || "";
         let rawTitle = item.title || "";
-        let cleanId = rawId.replace(/_status_icon.*$/, "").replace(/.*[\.\/]/, "");
-        let cleanTitle = rawTitle.replace(/.*[\.\/]/, "");
+        let cleanId = rawId.replace(/_status_icon.*$/, "").replace(/.*[\.\/]/, "").trim();
+        let cleanTitle = rawTitle.replace(/.*[\.\/]/, "").trim();
 
         if (pid) {
             root.run("kill -TERM " + pid + " 2>/dev/null; sleep 0.2; kill -0 " + pid + " 2>/dev/null && kill -KILL " + pid + " 2>/dev/null");
