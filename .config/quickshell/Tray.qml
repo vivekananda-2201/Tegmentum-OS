@@ -4,7 +4,6 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Services.SystemTray
-import Quickshell.DBusMenu
 
 Item {
     id: root
@@ -15,17 +14,22 @@ Item {
 
     property bool expanded: false
     property bool pinned: false
-    property bool menuOpen: false
 
-    property int hoveredItemCount: 0
+    // Context menu state
+    property var contextMenuItem: null
+    property var contextMenuModelData: null
+    property string contextMenuTitle: ""
 
+    readonly property bool menuOpen: contextMenuItem !== null
+    readonly property bool hovered: trayAreaHover.hovered || chevronMa.containsMouse || expanded || pinned || menuOpen
     readonly property int itemCount: SystemTray.items.values ? SystemTray.items.values.length : 0
     readonly property bool hasItems: itemCount > 0
     readonly property bool chevronVisible: (isRightBarHovered || expanded || pinned || menuOpen) && hasItems
-    readonly property bool hovered: chevronMa.containsMouse || drawerHover.hovered || hoveredItemCount > 0 || expanded || pinned || menuOpen
 
     implicitHeight: 18
     implicitWidth: trayRow.implicitWidth
+    width: trayRow.implicitWidth
+    height: 18
 
     // Fire-and-forget process runner
     Process { id: runner }
@@ -80,49 +84,19 @@ Item {
             if (toplevel.workspace) {
                 toplevel.workspace.activate();
             }
-            root.run("hyprctl dispatch 'hl.dsp.focus({window=\"address:" + toplevel.address + "\"})'");
-        } else {
-            // App may be unminimizing now; retry focus after short delay
-            focusDelayTimer.targetId = id;
-            focusDelayTimer.targetTitle = title;
-            focusDelayTimer.restart();
+            root.run("hyprctl dispatch focuswindow address:" + toplevel.address + " 2>/dev/null || hyprctl dispatch 'hl.dsp.focus({window=\"address:" + toplevel.address + "\"})'");
         }
     }
 
-    // Delayed focus for windows unminimizing from tray
-    Timer {
-        id: focusDelayTimer
-        interval: 150
-        property string targetId: ""
-        property string targetTitle: ""
-        onTriggered: {
-            const toplevels = (Hyprland.toplevels && Hyprland.toplevels.values) ? Hyprland.toplevels.values : [];
-            const toplevel = toplevels.find(t => {
-                const ipc = t.lastIpcObject || {};
-                const c = String(ipc.class || "").toLowerCase();
-                const ic = String(ipc.initialClass || "").toLowerCase();
-                const tTitle = String(t.title || "").toLowerCase();
-                return (c && (targetId.includes(c) || c.includes(targetId)))
-                    || (ic && (targetId.includes(ic) || ic.includes(targetId)))
-                    || (targetTitle && (tTitle.includes(targetTitle) || targetTitle.includes(tTitle)));
-            });
-            if (toplevel) {
-                if (toplevel.workspace) {
-                    toplevel.workspace.activate();
-                }
-                root.run("hyprctl dispatch 'hl.dsp.focus({window=\"address:" + toplevel.address + "\"})'");
-            }
-        }
-    }
-
-    // Completely terminate background application
-    function quitApp(item) {
+    // Terminate item completely (Quit / Exit)
+    function terminateItem(item) {
         if (!item) return;
+
         const id = (item.id || "").toLowerCase();
         const title = (item.title || "").toLowerCase();
 
-        // 1. Try to find exact PID from Hyprland toplevels
-        let targetPid = null;
+        // 1. Try finding exact PID from Hyprland toplevels
+        let pid = null;
         const toplevels = (Hyprland.toplevels && Hyprland.toplevels.values) ? Hyprland.toplevels.values : [];
         const toplevel = toplevels.find(t => {
             const ipc = t.lastIpcObject || {};
@@ -135,20 +109,50 @@ Item {
         });
 
         if (toplevel && toplevel.lastIpcObject && toplevel.lastIpcObject.pid) {
-            targetPid = toplevel.lastIpcObject.pid;
+            pid = toplevel.lastIpcObject.pid;
         }
 
-        if (targetPid) {
-            root.run("kill -15 " + targetPid + " 2>/dev/null; sleep 0.2; kill -9 " + targetPid + " 2>/dev/null || true");
+        // 2. Check if ID has an embedded PID (e.g. StatusNotifierItem-3822-1)
+        if (!pid) {
+            const pidMatch = (item.id || "").match(/-(\d+)-/);
+            if (pidMatch && pidMatch[1]) {
+                pid = parseInt(pidMatch[1]);
+            }
+        }
+
+        // 3. Fallback candidates for pkill
+        let rawId = item.id || "";
+        let rawTitle = item.title || "";
+        let cleanId = rawId.replace(/_status_icon.*$/, "").replace(/.*[\.\/]/, "");
+        let cleanTitle = rawTitle.replace(/.*[\.\/]/, "");
+
+        if (pid) {
+            root.run("kill -TERM " + pid + " 2>/dev/null; sleep 0.2; kill -0 " + pid + " 2>/dev/null && kill -KILL " + pid + " 2>/dev/null");
         } else {
-            const rawName = item.id || item.title || "";
-            const cleanName = rawName.split(".").pop().toLowerCase();
-            root.run("pkill -15 -x '" + rawName + "' 2>/dev/null || pkill -15 -x '" + cleanName + "' 2>/dev/null || pkill -15 -i -f '" + cleanName + "' 2>/dev/null; sleep 0.2; pkill -9 -x '" + cleanName + "' 2>/dev/null || true");
+            const target = cleanId || cleanTitle;
+            if (target) {
+                root.run("pkill -x -i '" + target + "' 2>/dev/null || pkill -f -i '" + target + "' 2>/dev/null");
+            }
         }
+    }
 
-        root.menuOpen = false;
-        root.activeMenuItem = null;
-        root.activeMenuItemDelegate = null;
+    function openContextMenu(delegateItem, modelData) {
+        root.contextMenuItem = delegateItem;
+        root.contextMenuModelData = modelData;
+        root.contextMenuTitle = (modelData.title || modelData.id || "Application").trim();
+        menuCloseTimer.stop();
+        closeTimer.stop();
+        root.expanded = true;
+    }
+
+    function closeContextMenu() {
+        root.contextMenuItem = null;
+        root.contextMenuModelData = null;
+        root.contextMenuTitle = "";
+        menuCloseTimer.stop();
+        if (!root.pinned && !trayAreaHover.hovered) {
+            closeTimer.restart();
+        }
     }
 
     // Debounce timer for smooth collapse without jitter
@@ -156,25 +160,39 @@ Item {
         id: closeTimer
         interval: 450
         onTriggered: {
-            const isMouseInTray = chevronMa.containsMouse || drawerHover.hovered || root.hoveredItemCount > 0 || (menuBoxHover.hovered);
-            if (!root.pinned && !isMouseInTray) {
+            if (!root.pinned && !root.menuOpen && !trayAreaHover.hovered) {
                 root.expanded = false;
-                root.menuOpen = false;
-                root.activeMenuItem = null;
-                root.activeMenuItemDelegate = null;
-                root.activeTooltipItem = null;
             }
         }
     }
 
-    // Tooltip & Context Menu properties
-    property var activeTooltipItem: null
-    property string activeTooltipTitle: ""
-    property string activeTooltipDesc: ""
+    // Context menu auto-close timer when mouse leaves menu area
+    Timer {
+        id: menuCloseTimer
+        interval: 800
+        onTriggered: {
+            if (!menuBoxHover.hovered && !trayAreaHover.hovered) {
+                root.closeContextMenu();
+            }
+        }
+    }
 
-    property var activeMenuItem: null
-    property var activeMenuItemDelegate: null
-    property var activeMenuItemAnchor: null
+    // Enclosing hover detector covering the whole tray component
+    HoverHandler {
+        id: trayAreaHover
+        onHoveredChanged: {
+            if (hovered) {
+                closeTimer.stop();
+                if (root.menuOpen) menuCloseTimer.stop();
+            } else {
+                if (!root.pinned && !root.menuOpen) {
+                    closeTimer.restart();
+                } else if (root.menuOpen) {
+                    menuCloseTimer.restart();
+                }
+            }
+        }
+    }
 
     Row {
         id: trayRow
@@ -201,7 +219,7 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 1
                 radius: 4
-                color: chevronMa.containsMouse ? Qt.alpha(Theme.text, 0.1) : "transparent"
+                color: (chevronHover.hovered || chevronMa.containsMouse) ? Qt.alpha(Theme.text, 0.1) : "transparent"
                 Behavior on color { ColorAnimation { duration: Theme.animFast } }
             }
 
@@ -210,10 +228,10 @@ Item {
                 anchors.centerIn: parent
                 anchors.verticalCenterOffset: root.iconYOffset
                 text: "\uDB80\uDD41" // nf-md chevron_left
-                color: (chevronMa.containsMouse || root.pinned || root.menuOpen) ? Theme.accent : Theme.textDim
+                color: (chevronHover.hovered || chevronMa.containsMouse || root.pinned || root.expanded) ? Theme.accent : Theme.textDim
                 font.family: Theme.iconFont
                 font.pixelSize: 13
-                rotation: (root.expanded || root.menuOpen) ? 180 : 0
+                rotation: (root.expanded || root.pinned) ? 180 : 0
 
                 Behavior on rotation {
                     NumberAnimation { duration: Theme.animMed; easing.type: Easing.OutCubic }
@@ -221,24 +239,29 @@ Item {
                 Behavior on color { ColorAnimation { duration: Theme.animFast } }
             }
 
+            HoverHandler {
+                id: chevronHover
+                onHoveredChanged: {
+                    if (hovered) {
+                        closeTimer.stop();
+                        root.expanded = true;
+                    }
+                }
+            }
+
             MouseArea {
                 id: chevronMa
                 anchors.fill: parent
                 hoverEnabled: true
                 acceptedButtons: Qt.LeftButton
+                cursorShape: Qt.PointingHandCursor
                 onEntered: {
                     closeTimer.stop();
                     root.expanded = true;
                 }
-                onExited: {
-                    if (!root.pinned && !root.menuOpen && !drawerHover.hovered && root.hoveredItemCount === 0) {
-                        closeTimer.restart();
-                    }
-                }
                 onClicked: {
-                    if (root.menuOpen) root.menuOpen = false;
                     root.pinned = !root.pinned;
-                    root.expanded = root.pinned || chevronMa.containsMouse;
+                    root.expanded = root.pinned || trayAreaHover.hovered || chevronHover.hovered;
                 }
             }
         }
@@ -254,20 +277,6 @@ Item {
                 NumberAnimation {
                     duration: Theme.animMed
                     easing.type: Easing.OutCubic
-                }
-            }
-
-            HoverHandler {
-                id: drawerHover
-                onHoveredChanged: {
-                    if (hovered) {
-                        closeTimer.stop();
-                        root.expanded = true;
-                    } else {
-                        if (!root.pinned && !root.menuOpen && !chevronMa.containsMouse && root.hoveredItemCount === 0) {
-                            closeTimer.restart();
-                        }
-                    }
                 }
             }
 
@@ -287,16 +296,24 @@ Item {
                         width: 20
                         height: 18
 
-                        readonly property bool isSelected: root.menuOpen && root.activeMenuItem === modelData
-
                         // Hover capsule background
                         Rectangle {
                             anchors.fill: parent
                             anchors.margins: 1
                             radius: 4
-                            color: itemDelegate.isSelected ? Qt.alpha(Theme.accent, 0.25)
-                                 : itemMa.containsMouse ? Qt.alpha(Theme.accent, 0.14) : "transparent"
+                            color: (root.contextMenuItem === itemDelegate) ? Qt.alpha(Theme.accent, 0.22)
+                                 : (itemHover.hovered || itemMa.containsMouse) ? Qt.alpha(Theme.accent, 0.14) : "transparent"
                             Behavior on color { ColorAnimation { duration: Theme.animFast } }
+                        }
+
+                        HoverHandler {
+                            id: itemHover
+                            onHoveredChanged: {
+                                if (hovered) {
+                                    closeTimer.stop();
+                                    root.expanded = true;
+                                }
+                            }
                         }
 
                         // Icon image
@@ -327,67 +344,28 @@ Item {
                             font.bold: true
                         }
 
-                        // Native DBus context menu anchor
-                        QsMenuAnchor {
-                            id: menuAnchor
-                            anchor.window: root.barWindow
-                            anchor.item: itemDelegate
-                            menu: modelData.menu
-                        }
-
                         MouseArea {
                             id: itemMa
                             anchors.fill: parent
                             hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
                             acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                             onEntered: {
-                                root.hoveredItemCount++;
                                 closeTimer.stop();
                                 root.expanded = true;
-                                if (!root.menuOpen) {
-                                    root.activeTooltipItem = itemDelegate;
-                                    root.activeTooltipTitle = (modelData.tooltipTitle || modelData.title || "").trim();
-                                    root.activeTooltipDesc = (modelData.tooltipDescription || "").trim();
-                                }
-                            }
-                            onExited: {
-                                root.hoveredItemCount = Math.max(0, root.hoveredItemCount - 1);
-                                if (root.activeTooltipItem === itemDelegate && !root.menuOpen) {
-                                    root.activeTooltipItem = null;
-                                    root.activeTooltipTitle = "";
-                                    root.activeTooltipDesc = "";
-                                }
-                                if (!root.pinned && !root.menuOpen && !drawerHover.hovered && !chevronMa.containsMouse) {
-                                    closeTimer.restart();
-                                }
                             }
                             onClicked: mouse => {
                                 if (mouse.button === Qt.RightButton) {
-                                    // Toggle if clicking the same item, otherwise switch to it
-                                    if (root.menuOpen && root.activeMenuItem === modelData) {
-                                        root.menuOpen = false;
-                                        root.activeMenuItem = null;
-                                        root.activeMenuItemDelegate = null;
+                                    if (root.contextMenuItem === itemDelegate) {
+                                        root.closeContextMenu();
                                     } else {
-                                        root.activeTooltipItem = null;
-                                        root.activeMenuItem = modelData;
-                                        root.activeMenuItemDelegate = itemDelegate;
-                                        root.activeMenuItemAnchor = menuAnchor;
-                                        root.menuOpen = true;
-                                        closeTimer.stop();
-                                        root.expanded = true;
+                                        root.openContextMenu(itemDelegate, modelData);
                                     }
                                 } else if (mouse.button === Qt.LeftButton) {
-                                    root.menuOpen = false;
-                                    if (modelData.onlyMenu) {
-                                        if (modelData.hasMenu && modelData.menu) {
-                                            menuAnchor.open();
-                                        }
-                                    } else {
-                                        root.activateItem(modelData);
-                                    }
+                                    root.closeContextMenu();
+                                    root.activateItem(modelData);
                                 } else if (mouse.button === Qt.MiddleButton) {
-                                    root.menuOpen = false;
+                                    root.closeContextMenu();
                                     modelData.secondaryActivate();
                                 }
                             }
@@ -401,251 +379,161 @@ Item {
         }
     }
 
-    // Shared Tooltip Popup Window (only visible when context menu is closed)
-    PopupWindow {
-        id: tooltipPopup
-        anchor.window: root.barWindow
-        anchor.item: root.activeTooltipItem ? root.activeTooltipItem : root
-        anchor.edges: Edges.Bottom
-        anchor.gravity: Edges.Bottom
-        anchor.margins.top: 6
-        visible: !root.menuOpen && root.activeTooltipItem !== null && (root.activeTooltipTitle !== "" || root.activeTooltipDesc !== "")
-        implicitWidth: tipCol.implicitWidth + 14
-        implicitHeight: tipCol.implicitHeight + 8
-        color: "transparent"
-
-        Rectangle {
-            anchors.fill: parent
-            radius: 4
-            color: Theme.bgCard
-            border.width: 1
-            border.color: Theme.border
-
-            Column {
-                id: tipCol
-                anchors.centerIn: parent
-                spacing: 1
-
-                Text {
-                    text: root.activeTooltipTitle
-                    color: Theme.text
-                    font.family: Theme.fontFamily
-                    font.pixelSize: 10
-                    font.bold: true
-                    visible: text !== ""
-                }
-                Text {
-                    text: root.activeTooltipDesc
-                    color: Theme.textDim
-                    font.family: Theme.fontFamily
-                    font.pixelSize: 9
-                    visible: text !== ""
-                }
-            }
-        }
-    }
-
-    // Right-Click Context Menu Popup (with Quit & Terminate options!)
+    // Context Menu Popup Window (anchored right below the clicked app icon)
     PopupWindow {
         id: contextMenuPopup
         anchor.window: root.barWindow
-        anchor.item: root.activeMenuItemDelegate ? root.activeMenuItemDelegate : root
+        anchor.item: root.contextMenuItem ? root.contextMenuItem : root
         anchor.edges: Edges.Bottom
         anchor.gravity: Edges.Bottom
-        anchor.margins.top: 6
-        visible: root.menuOpen && root.activeMenuItem !== null
-        implicitWidth: menuBox.width
-        implicitHeight: menuBox.height
+        anchor.margins.top: 4
+        anchor.adjustment: PopupAdjustment.FlipY | PopupAdjustment.SlideX
+        visible: root.contextMenuItem !== null
+        implicitWidth: 160
+        implicitHeight: menuBox.implicitHeight
         color: "transparent"
+
+        onClosed: {
+            if (root.contextMenuItem !== null) {
+                root.closeContextMenu();
+            }
+        }
 
         Rectangle {
             id: menuBox
-            width: Math.max(160, menuCol.implicitWidth + 24)
-            height: menuCol.implicitHeight + 16
-            radius: 8
+            width: 160
+            implicitWidth: 160
+            implicitHeight: menuCol.implicitHeight + 16
+            radius: 6
             color: Theme.bgCard
             border.width: 1
-            border.color: Theme.border
+            border.color: Theme.borderAccent
 
             HoverHandler {
                 id: menuBoxHover
                 onHoveredChanged: {
                     if (hovered) {
+                        menuCloseTimer.stop();
                         closeTimer.stop();
                     } else {
-                        if (!root.pinned && !chevronMa.containsMouse && !drawerHover.hovered && root.hoveredItemCount === 0) {
-                            closeTimer.restart();
-                        }
+                        menuCloseTimer.restart();
                     }
                 }
             }
 
             Column {
                 id: menuCol
-                anchors.centerIn: parent
-                width: parent.width - 16
-                spacing: 4
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.margins: 8
+                spacing: 6
 
-                // Header: App Icon + App Name
+                // Header with App Name
                 Row {
-                    spacing: 8
-                    height: 22
                     width: parent.width
-
-                    Image {
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 14; height: 14
-                        source: root.activeMenuItem ? root.resolveIcon(root.activeMenuItem.icon) : ""
-                        fillMode: Image.PreserveAspectFit
-                        visible: status === Image.Ready
-                    }
+                    spacing: 6
 
                     Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: root.activeMenuItem ? (root.activeMenuItem.title || root.activeMenuItem.id || "App") : ""
+                        text: root.contextMenuTitle
                         color: Theme.text
                         font.family: Theme.fontFamily
                         font.pixelSize: 11
                         font.bold: true
                         elide: Text.ElideRight
-                        width: parent.width - 24
+                        width: parent.width
                     }
                 }
 
-                // Divider line
+                // Divider
                 Rectangle {
                     width: parent.width
                     height: 1
-                    color: Qt.alpha(Theme.borderAccent, 0.6)
+                    color: Qt.alpha(Theme.text, 0.12)
                 }
 
-                // Action 1: Focus Window / Open
+                // Action: Open / Focus
                 Rectangle {
                     width: parent.width
-                    height: 24
+                    height: 26
                     radius: 4
-                    color: focusBtnMa.containsMouse ? Qt.alpha(Theme.accent, 0.12) : "transparent"
+                    color: openMa.containsMouse ? Qt.alpha(Theme.accent, 0.12) : "transparent"
                     Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
                     Row {
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: parent.left
+                        anchors.fill: parent
                         anchors.leftMargin: 8
                         spacing: 8
+                        anchors.verticalCenter: parent.verticalCenter
 
                         Text {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: "\uDB80\uDF73" // nf-md open_in_app / focus
-                            color: focusBtnMa.containsMouse ? Theme.accent : Theme.textDim
+                            text: "\uf08e" // nf-fa-external_link
+                            color: openMa.containsMouse ? Theme.accent : Theme.textDim
                             font.family: Theme.iconFont
-                            font.pixelSize: 12
+                            font.pixelSize: 11
+                            anchors.verticalCenter: parent.verticalCenter
                         }
                         Text {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: "Focus Window"
-                            color: focusBtnMa.containsMouse ? Theme.text : Theme.textDim
+                            text: "Open / Focus"
+                            color: openMa.containsMouse ? Theme.accent : Theme.text
                             font.family: Theme.fontFamily
                             font.pixelSize: 11
+                            anchors.verticalCenter: parent.verticalCenter
                         }
                     }
 
                     MouseArea {
-                        id: focusBtnMa
+                        id: openMa
                         anchors.fill: parent
                         hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            if (root.activeMenuItem) {
-                                root.activateItem(root.activeMenuItem);
-                            }
-                            root.menuOpen = false;
+                            const item = root.contextMenuModelData;
+                            root.closeContextMenu();
+                            if (item) root.activateItem(item);
                         }
                     }
                 }
 
-                // Action 2: App Native DBus Menu (if provided)
+                // Action: Quit / Exit (Completely terminates the application)
                 Rectangle {
-                    visible: root.activeMenuItem !== null && root.activeMenuItem.hasMenu && root.activeMenuItem.menu !== null
                     width: parent.width
-                    height: visible ? 24 : 0
+                    height: 26
                     radius: 4
-                    color: nativeBtnMa.containsMouse ? Qt.alpha(Theme.accent, 0.12) : "transparent"
+                    color: quitMa.containsMouse ? Qt.alpha(Theme.danger, 0.22) : "transparent"
                     Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
                     Row {
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: parent.left
+                        anchors.fill: parent
                         anchors.leftMargin: 8
                         spacing: 8
+                        anchors.verticalCenter: parent.verticalCenter
 
                         Text {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: "\uDB80\uDE8B" // nf-md dots_horizontal
-                            color: nativeBtnMa.containsMouse ? Theme.accent : Theme.textDim
+                            text: "\uf011" // nf-fa-power_off
+                            color: quitMa.containsMouse ? Theme.danger : Theme.textDim
                             font.family: Theme.iconFont
-                            font.pixelSize: 12
+                            font.pixelSize: 11
+                            anchors.verticalCenter: parent.verticalCenter
                         }
                         Text {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: "App Menu"
-                            color: nativeBtnMa.containsMouse ? Theme.text : Theme.textDim
+                            text: "Quit / Exit"
+                            color: quitMa.containsMouse ? Theme.danger : Theme.text
                             font.family: Theme.fontFamily
                             font.pixelSize: 11
+                            anchors.verticalCenter: parent.verticalCenter
                         }
                     }
 
                     MouseArea {
-                        id: nativeBtnMa
+                        id: quitMa
                         anchors.fill: parent
                         hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            const anchor = root.activeMenuItemAnchor;
-                            root.menuOpen = false;
-                            if (anchor) {
-                                anchor.open();
-                            }
-                        }
-                    }
-                }
-
-                // Action 3: Quit / Terminate Application
-                Rectangle {
-                    width: parent.width
-                    height: 24
-                    radius: 4
-                    color: quitBtnMa.containsMouse ? Qt.alpha(Theme.danger, 0.22) : "transparent"
-                    Behavior on color { ColorAnimation { duration: Theme.animFast } }
-
-                    Row {
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: parent.left
-                        anchors.leftMargin: 8
-                        spacing: 8
-
-                        Text {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: "\u23FB" // power icon
-                            color: Theme.danger
-                            font.family: Theme.iconFont
-                            font.pixelSize: 12
-                        }
-                        Text {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: "Quit Application"
-                            color: quitBtnMa.containsMouse ? Theme.danger : Theme.text
-                            font.family: Theme.fontFamily
-                            font.pixelSize: 11
-                            font.bold: quitBtnMa.containsMouse
-                        }
-                    }
-
-                    MouseArea {
-                        id: quitBtnMa
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onClicked: {
-                            if (root.activeMenuItem) {
-                                root.quitApp(root.activeMenuItem);
-                            }
+                            const item = root.contextMenuModelData;
+                            root.closeContextMenu();
+                            if (item) root.terminateItem(item);
                         }
                     }
                 }
