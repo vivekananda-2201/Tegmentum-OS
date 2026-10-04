@@ -61,7 +61,8 @@ Item {
             Quickshell.env("HOME") + "/.config/tegmentum/bin/tray-control.py",
             "activate",
             item.id || "",
-            item.title || ""
+            item.title || "",
+            item.tooltip || ""
         ]);
     }
 
@@ -73,7 +74,8 @@ Item {
             Quickshell.env("HOME") + "/.config/tegmentum/bin/tray-control.py",
             "quit",
             item.id || "",
-            item.title || ""
+            item.title || "",
+            item.tooltip || ""
         ]);
     }
 
