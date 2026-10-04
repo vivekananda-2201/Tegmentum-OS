@@ -31,13 +31,6 @@ Item {
     width: trayRow.implicitWidth
     height: 18
 
-    // Fire-and-forget process runner
-    Process { id: runner }
-    function run(cmd) {
-        runner.command = ["sh", "-c", cmd];
-        runner.running = true;
-    }
-
     // Resolve icon path from freedesktop theme, image provider, or filesystem
     function resolveIcon(icon) {
         if (!icon) return "";
@@ -60,152 +53,28 @@ Item {
         return "image://icon/" + icon;
     }
 
-    // Find matching Hyprland toplevel window for an item
-    function findToplevel(item) {
-        if (!item) return null;
-        const toplevels = (Hyprland.toplevels && Hyprland.toplevels.values) ? Hyprland.toplevels.values : [];
-        if (!toplevels || toplevels.length === 0) return null;
-
-        const rawId = (item.id || "").toLowerCase();
-        const rawTitle = (item.title || "").toLowerCase();
-        const rawTooltip = (item.tooltipTitle || "").toLowerCase();
-
-        // 1. Embedded PID match (e.g. org.freedesktop.StatusNotifierItem-3822-1)
-        const pidMatch = (item.id || "").match(/-(\d+)-/);
-        if (pidMatch && pidMatch[1]) {
-            const targetPid = parseInt(pidMatch[1]);
-            const match = toplevels.find(t => {
-                const ipc = t.lastIpcObject || {};
-                return ipc.pid === targetPid && (ipc.mapped !== false) && !ipc.hidden;
-            });
-            if (match) return match;
-        }
-
-        // 2. Clean names
-        const cleanId = rawId.replace(/_status_icon.*$/, "").replace(/.*[\.\/]/, "").trim();
-        const cleanTitle = rawTitle.replace(/.*[\.\/]/, "").trim();
-
-        // 3. Search toplevels
-        return toplevels.find(t => {
-            const ipc = t.lastIpcObject || {};
-            const isVisible = (ipc.mapped !== false) && !ipc.hidden;
-            if (!isVisible) return false;
-
-            const c = String(ipc.class || "").toLowerCase();
-            const ic = String(ipc.initialClass || "").toLowerCase();
-            const tTitle = String(t.title || ipc.title || ipc.initialTitle || "").toLowerCase();
-
-            if (cleanId && cleanId.length > 2) {
-                if (c.includes(cleanId) || cleanId.includes(c)) return true;
-                if (ic.includes(cleanId) || cleanId.includes(ic)) return true;
-                if (tTitle.includes(cleanId)) return true;
-            }
-
-            if (cleanTitle && cleanTitle.length > 2) {
-                if (c.includes(cleanTitle) || cleanTitle.includes(c)) return true;
-                if (ic.includes(cleanTitle) || cleanTitle.includes(ic)) return true;
-                if (tTitle.includes(cleanTitle) || cleanTitle.includes(tTitle)) return true;
-            }
-
-            if (rawTooltip && rawTooltip.length > 2) {
-                if (tTitle.includes(rawTooltip) || rawTooltip.includes(tTitle)) return true;
-                if (c.includes(rawTooltip) || rawTooltip.includes(c)) return true;
-            }
-
-            if (rawId && rawId.length > 2) {
-                if (c.includes(rawId) || rawId.includes(c)) return true;
-                if (ic.includes(rawId) || rawId.includes(ic)) return true;
-            }
-
-            return false;
-        });
-    }
-
-    // Timer to focus newly opened window if app was previously minimized to tray
-    Timer {
-        id: focusNewWindowTimer
-        interval: 180
-        property var targetItem: null
-        onTriggered: {
-            if (targetItem) {
-                const toplevel = root.findToplevel(targetItem);
-                if (toplevel) {
-                    const ipc = toplevel.lastIpcObject || {};
-                    const ws = (ipc.workspace && ipc.workspace.name) ? ipc.workspace.name
-                             : (toplevel.workspace && toplevel.workspace.name) ? toplevel.workspace.name
-                             : (toplevel.workspace && toplevel.workspace.id) ? String(toplevel.workspace.id) : "";
-                    if (ws) {
-                        root.run("hyprctl dispatch 'hl.dsp.focus({workspace=\"" + ws + "\"})'");
-                    }
-                    root.run("hyprctl dispatch 'hl.dsp.focus({window=\"address:" + toplevel.address + "\"})'");
-                }
-                targetItem = null;
-            }
-        }
-    }
-
-    // Activate item and focus Hyprland window/workspace
+    // Activate item and focus Hyprland window/workspace (state-aware)
     function activateItem(item) {
         if (!item) return;
-
-        const toplevel = root.findToplevel(item);
-
-        if (toplevel) {
-            // App is ALREADY graphically open!
-            // Do NOT call item.activate() because DBus StatusNotifierItem toggles/minimizes the window!
-            const ipc = toplevel.lastIpcObject || {};
-            const ws = (ipc.workspace && ipc.workspace.name) ? ipc.workspace.name
-                     : (toplevel.workspace && toplevel.workspace.name) ? toplevel.workspace.name
-                     : (toplevel.workspace && toplevel.workspace.id) ? String(toplevel.workspace.id) : "";
-
-            if (ws) {
-                root.run("hyprctl dispatch 'hl.dsp.focus({workspace=\"" + ws + "\"})'");
-            }
-            root.run("hyprctl dispatch 'hl.dsp.focus({window=\"address:" + toplevel.address + "\"})'");
-        } else {
-            // App is NOT graphically open (it is hidden/minimized to tray).
-            // Calling item.activate() will open/show its window!
-            item.activate();
-
-            // After unhiding, focus the window once mapped
-            focusNewWindowTimer.targetItem = item;
-            focusNewWindowTimer.restart();
-        }
+        Quickshell.execDetached([
+            "python3",
+            Quickshell.env("HOME") + "/.config/tegmentum/bin/tray-control.py",
+            "activate",
+            item.id || "",
+            item.title || ""
+        ]);
     }
 
     // Terminate item completely (Quit / Exit)
     function terminateItem(item) {
         if (!item) return;
-
-        // 1. Try finding exact PID from Hyprland toplevels
-        let pid = null;
-        const toplevel = root.findToplevel(item);
-        if (toplevel && toplevel.lastIpcObject && toplevel.lastIpcObject.pid) {
-            pid = toplevel.lastIpcObject.pid;
-        }
-
-        // 2. Check if ID has an embedded PID (e.g. StatusNotifierItem-3822-1)
-        if (!pid) {
-            const pidMatch = (item.id || "").match(/-(\d+)-/);
-            if (pidMatch && pidMatch[1]) {
-                pid = parseInt(pidMatch[1]);
-            }
-        }
-
-        // 3. Fallback candidates for pkill
-        let rawId = item.id || "";
-        let rawTitle = item.title || "";
-        let cleanId = rawId.replace(/_status_icon.*$/, "").replace(/.*[\.\/]/, "").trim();
-        let cleanTitle = rawTitle.replace(/.*[\.\/]/, "").trim();
-
-        if (pid) {
-            root.run("kill -TERM " + pid + " 2>/dev/null; sleep 0.2; kill -0 " + pid + " 2>/dev/null && kill -KILL " + pid + " 2>/dev/null");
-        } else {
-            const target = cleanId || cleanTitle;
-            if (target) {
-                root.run("pkill -x -i '" + target + "' 2>/dev/null || pkill -f -i '" + target + "' 2>/dev/null");
-            }
-        }
+        Quickshell.execDetached([
+            "python3",
+            Quickshell.env("HOME") + "/.config/tegmentum/bin/tray-control.py",
+            "quit",
+            item.id || "",
+            item.title || ""
+        ]);
     }
 
     function openContextMenu(delegateItem, modelData) {
