@@ -1,0 +1,86 @@
+# 43PR / Matugen dynamic theme for btop
+# Generated from wallpaper colors
+
+# Main bg
+theme[main_bg]="{{bg}}"
+
+# Main text color
+theme[main_fg]="{{fg}}"
+
+# Title color for boxes
+theme[title]="{{fg}}"
+
+# Highlight color for keyboard shortcuts
+theme[hi_fg]="{{accent}}"
+
+# Background color of selected item in processes box
+theme[selected_bg]="{{bg_hover}}"
+
+# Foreground color of selected item in processes box
+theme[selected_fg]="{{fg}}"
+
+# Color of inactive/disabled text
+theme[inactive_fg]="{{fg_muted}}"
+
+# Misc colors for processes box including mini cpu graphs, details memory graph and details status text
+theme[proc_misc]="{{accent}}"
+
+# Cpu box outline color
+theme[cpu_box]="{{border}}"
+
+# Memory/disks box outline color
+theme[mem_box]="{{border}}"
+
+# Net up/down box outline color
+theme[net_box]="{{border}}"
+
+# Processes box outline color
+theme[proc_box]="{{border}}"
+
+# Box divider line and small boxes line color
+theme[div_line]="{{border}}"
+
+# Temperature graph colors
+theme[temp_start]="{{ok}}"
+theme[temp_mid]="{{highlight}}"
+theme[temp_end]="{{danger}}"
+
+# CPU graph colors
+theme[cpu_start]="{{ok}}"
+theme[cpu_mid]="{{accent}}"
+theme[cpu_end]="{{danger}}"
+
+# Mem/Disk free meter
+theme[free_start]="{{ok}}"
+theme[free_mid]="{{accent}}"
+theme[free_end]="{{danger}}"
+
+# Mem/Disk cached meter
+theme[cached_start]="{{highlight}}"
+theme[cached_mid]="{{accent}}"
+theme[cached_end]="{{danger}}"
+
+# Mem/Disk available meter
+theme[available_start]="{{ok}}"
+theme[available_mid]="{{accent}}"
+theme[available_end]="{{danger}}"
+
+# Mem/Disk used meter
+theme[used_start]="{{ok}}"
+theme[used_mid]="{{highlight}}"
+theme[used_end]="{{danger}}"
+
+# Download graph colors
+theme[download_start]="{{ok}}"
+theme[download_mid]="{{accent}}"
+theme[download_end]="{{danger}}"
+
+# Upload graph colors
+theme[upload_start]="{{ok}}"
+theme[upload_mid]="{{accent}}"
+theme[upload_end]="{{danger}}"
+
+# Process box gradient colors
+theme[process_start]="{{ok}}"
+theme[process_mid]="{{accent}}"
+theme[process_end]="{{danger}}"
