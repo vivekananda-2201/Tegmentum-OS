@@ -426,6 +426,23 @@ When you run `./install.sh`:
 - **Power Menu Shortcut Rebound**:
   - Rebound the rofi power menu from <kbd>Super</kbd> + <kbd>`</kbd> to <kbd>Super</kbd> + <kbd>Esc</kbd>.
 
+---
+
+## 26. Terminal Listing Aliases with Hidden & Classified Files Support
+- **Goal**: Standardize directory listing commands in shell configurations (`~/.zshrc` and `~/.bashrc`) with color output, classification indicators, and visibility of hidden dotfiles across all commands.
+- **Aliases Configured**:
+  ```bash
+  # Listing
+  alias ls='ls -a --color=auto'
+  alias ll='ls -lah --color=auto'
+  alias la='ls -A --color=auto'
+  alias l='ls -CF -a --color=auto'
+  ```
+- **Files Modified**:
+  - [`~/.zshrc`](file:///home/vicky/.zshrc)
+  - [`~/.bashrc`](file:///home/vicky/.bashrc)
+  - [`~/Tegmentum-OS/.config/.zshrc`](file:///home/vicky/Tegmentum-OS/.config/.zshrc)
+
 
 
 
