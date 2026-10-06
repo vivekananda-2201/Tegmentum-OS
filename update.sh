@@ -75,7 +75,7 @@ if [[ "$SKIP_PULL" -eq 0 && "${UPDATE_REEXECED:-0}" -eq 0 ]]; then
                     success "Repository updated to latest version."
                     info "Re-executing updater to apply new updates..."
                     export UPDATE_REEXECED=1
-                    exec bash "$0" "$@"
+                    exec bash "$REPO_DIR/update.sh" "$@"
                 else
                     success "Repository is already up to date."
                 fi
@@ -198,9 +198,15 @@ fi
 # Sync
 # --------------------------------------------------
 
-info "Syncing ~/dotfiles/.config -> ~/.config ..."
+info "Syncing .config -> ~/.config ..."
 cp -a "$SRC/." "$CONFIG_DIR/"
 success "Config files synced."
+
+# Sync ~/.zshrc
+if [[ -f "$SRC/.zshrc" ]]; then
+    cp "$SRC/.zshrc" "$HOME/.zshrc"
+    success "Shell configuration (.zshrc) synced."
+fi
 
 info "Fixing executable permissions..."
 find "$CONFIG_DIR" -type f \( -name "*.sh" -o -name "*.py" \) -exec chmod +x {} \;
