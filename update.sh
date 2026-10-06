@@ -12,16 +12,17 @@ set -uo pipefail
 # folders — those are one-time install.sh concerns.
 #
 # Usage:
-#   ./update.sh                 install new packages + sync + regenerate theme
+#   ./update.sh                 auto-pull latest changes + install new packages + sync + regenerate theme
+#   ./update.sh --no-pull       skip pulling latest git changes
 #   ./update.sh --dry-run       show what would change, do nothing
 #   ./update.sh --skip-packages skip package installation, sync configs only
 #   ./update.sh --restart-shell also restart Quickshell (qs)
 #
 # Install and test:
-# chmod +x ~/dotfiles/update.sh
-# ~/dotfiles/update.sh --dry-run
+# chmod +x update.sh
+# ./update.sh --dry-run
 # Then run:
-# ~/dotfiles/update.sh
+# ./update.sh
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_DIR="$HOME/.config"
@@ -31,12 +32,14 @@ PACKAGE_FILE="$REPO_DIR/packages.txt"
 DRY_RUN=0
 RESTART_SHELL=0
 SKIP_PACKAGES=0
+SKIP_PULL=0
 
 for arg in "$@"; do
     case "$arg" in
-        --dry-run) DRY_RUN=1 ;;
+        --dry-run) DRY_RUN=1; SKIP_PULL=1 ;;
         --restart-shell) RESTART_SHELL=1 ;;
         --skip-packages) SKIP_PACKAGES=1 ;;
+        --no-pull|--skip-pull) SKIP_PULL=1 ;;
         *)
             printf '\033[1;31m[ERROR]\033[0m Unknown option: %s\n' "$arg" >&2
             exit 1
@@ -52,6 +55,35 @@ error()   { printf '\n\033[1;31m[ERROR]\033[0m %s\n' "$1" >&2; }
 if [[ "${EUID}" -eq 0 ]]; then
     error "Do not run this script as root."
     exit 1
+fi
+
+# --------------------------------------------------
+# Auto-update: Pull latest changes from git
+# --------------------------------------------------
+
+if [[ "$SKIP_PULL" -eq 0 && "${UPDATE_REEXECED:-0}" -eq 0 ]]; then
+    if git -C "$REPO_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        if [[ -n "$(git -C "$REPO_DIR" remote 2>/dev/null)" ]]; then
+            info "Checking for repository updates (git pull)..."
+
+            HEAD_BEFORE="$(git -C "$REPO_DIR" rev-parse HEAD 2>/dev/null || echo "")"
+
+            if git -C "$REPO_DIR" pull --ff-only 2>/dev/null || git -C "$REPO_DIR" pull 2>/dev/null; then
+                HEAD_AFTER="$(git -C "$REPO_DIR" rev-parse HEAD 2>/dev/null || echo "")"
+
+                if [[ -n "$HEAD_BEFORE" && "$HEAD_BEFORE" != "$HEAD_AFTER" ]]; then
+                    success "Repository updated to latest version."
+                    info "Re-executing updater to apply new updates..."
+                    export UPDATE_REEXECED=1
+                    exec bash "$0" "$@"
+                else
+                    success "Repository is already up to date."
+                fi
+            else
+                warning "Could not pull updates from remote (offline or local modifications). Continuing with local files..."
+            fi
+        fi
+    fi
 fi
 
 if [[ ! -d "$SRC" ]]; then
