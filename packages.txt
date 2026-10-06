@@ -19,7 +19,9 @@ polkit-kde-agent
 # --------------------------------------------------
 
 xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
 xorg-xwayland
+xsettingsd
 
 # --------------------------------------------------
 # Wallpaper / Screenshots / Image Tools

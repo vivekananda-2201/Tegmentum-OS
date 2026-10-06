@@ -88,3 +88,8 @@ ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=245'
 
 # Tegmentum theme controller
 theme() { python3 "$HOME/.config/tegmentum/bin/theme.py" "$@"; }
+
+# Toolkit & theme environment
+export QT_QPA_PLATFORM=wayland
+export QT_QPA_PLATFORMTHEME=xdgdesktopportal
+

@@ -12,6 +12,11 @@ browser = "brave"
 ---- AUTOSTART ----
 
 hl.on("hyprland.start", function()
+	-- Sync DBus and systemd activation environment
+	hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP QT_QPA_PLATFORM QT_QPA_PLATFORMTHEME")
+	systemd_env = "systemctl --user set-environment QT_QPA_PLATFORM=wayland QT_QPA_PLATFORMTHEME=xdgdesktopportal"
+	hl.exec_cmd(systemd_env)
+
 	-- Replaced by Quickshell native Bar and Notifications
 	-- hl.exec_cmd("waybar")
 	-- hl.exec_cmd("dunst")
@@ -30,6 +35,7 @@ end)
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
 hl.env("QT_QPA_PLATFORM", "wayland")
+hl.env("QT_QPA_PLATFORMTHEME", "xdgdesktopportal")
 hl.env("MOZ_ENABLE_WAYLAND", "1")
 
 ---- INPUT ----
