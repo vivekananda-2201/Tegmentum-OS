@@ -276,6 +276,11 @@ if [[ -d "$REPO_DIR/Wallpapers" ]]; then
     mkdir -p "$HOME/Pictures/Wallpapers"
     cp -a "$REPO_DIR/Wallpapers/." "$HOME/Pictures/Wallpapers/"
 
+    if [[ ! -f "$HOME/.cache/current_wallpaper" && -f "$HOME/Pictures/Wallpapers/Main/wallhaven-gw5qq7.jpg" ]]; then
+        mkdir -p "$HOME/.cache"
+        echo "$HOME/Pictures/Wallpapers/Main/wallhaven-gw5qq7.jpg" > "$HOME/.cache/current_wallpaper"
+    fi
+
     success "Wallpapers installed."
 fi
 

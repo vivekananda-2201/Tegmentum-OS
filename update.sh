@@ -8,8 +8,8 @@ set -uo pipefail
 # run. Installs any new packages.txt entries, mirrors ~/dotfiles/.config
 # into ~/.config, fixes permissions, and regenerates the theme.
 #
-# Does NOT touch: backups, default shell, PipeWire services, Papirus
-# folders, or wallpapers — those are one-time install.sh concerns.
+# Does NOT touch: backups, default shell, PipeWire services, or Papirus
+# folders — those are one-time install.sh concerns.
 #
 # Usage:
 #   ./update.sh                 install new packages + sync + regenerate theme
@@ -173,6 +173,23 @@ success "Config files synced."
 info "Fixing executable permissions..."
 find "$CONFIG_DIR" -type f \( -name "*.sh" -o -name "*.py" \) -exec chmod +x {} \;
 success "Permissions fixed."
+
+# --------------------------------------------------
+# Wallpapers
+# --------------------------------------------------
+
+if [[ -d "$REPO_DIR/Wallpapers" ]]; then
+    info "Syncing wallpapers to ~/Pictures/Wallpapers..."
+    mkdir -p "$HOME/Pictures/Wallpapers"
+    cp -a "$REPO_DIR/Wallpapers/." "$HOME/Pictures/Wallpapers/"
+
+    if [[ ! -f "$HOME/.cache/current_wallpaper" && -f "$HOME/Pictures/Wallpapers/Main/wallhaven-gw5qq7.jpg" ]]; then
+        mkdir -p "$HOME/.cache"
+        echo "$HOME/Pictures/Wallpapers/Main/wallhaven-gw5qq7.jpg" > "$HOME/.cache/current_wallpaper"
+    fi
+
+    success "Wallpapers synced."
+fi
 
 # --------------------------------------------------
 # Regenerate theme
