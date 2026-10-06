@@ -24,6 +24,11 @@ set -uo pipefail
 # Then run:
 # ./update.sh
 
+# ==============================================================================
+# DO NOT TOUCH: REPO_DIR RESOLUTION
+# Must resolve the canonical absolute path to the repository root so git commands
+# and the self-re-exec call work reliably regardless of the user's current directory.
+# ==============================================================================
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_DIR="$HOME/.config"
 SRC="$REPO_DIR/.config"
@@ -57,20 +62,55 @@ if [[ "${EUID}" -eq 0 ]]; then
     exit 1
 fi
 
-# --------------------------------------------------
-# Auto-update: Pull latest changes from git
-# --------------------------------------------------
+# ==============================================================================
+# DO NOT TOUCH / CRITICAL CORE MECHANISM: AUTO-UPDATE & SELF-RE-EXECUTION
+# ==============================================================================
+# This block is the foundation that makes Tegmentum-OS updates universal.
+# It automatically pulls the latest changes from GitHub so users only have to
+# run './update.sh' without needing to run 'git pull' manually first.
+#
+# RULES & ARCHITECTURE - WHY YOU MUST NEVER MODIFY OR MOVE THIS BLOCK:
+#
+# 1. POSITION IS CRITICAL:
+#    This block MUST execute before anything else (packages, configs, wallpapers).
+#    If new logic is placed above this, it will run with outdated code before
+#    the repo is updated.
+#
+# 2. BASH BUFFER OFFSET SAFETY (WHY exec bash IS MANDATORY):
+#    Bash reads script files sequentially from disk in chunks. When 'git pull'
+#    fetches an updated 'update.sh', the file on disk changes while bash is
+#    running. Without 'exec', bash would read shifted line offsets, causing
+#    corrupted execution, syntax errors, or skipped commands.
+#    'exec bash "$REPO_DIR/update.sh" "$@"' replaces the entire shell process,
+#    forcing bash to execute the newly fetched script cleanly from byte 0.
+#
+# 3. RECURSION GUARD ('UPDATE_REEXECED'):
+#    The 'UPDATE_REEXECED' environment variable prevents infinite loops.
+#    When the script re-executes itself, UPDATE_REEXECED=1 tells the new instance
+#    that git pull was already performed, so it proceeds to package & config sync.
+#
+# 4. REMOTE & WORKING TREE RESILIENCE:
+#    - 'git -C "$REPO_DIR"': Guarantees git executes in the repo root regardless
+#      of the user's terminal working directory.
+#    - '--ff-only' / 'git pull': Safely pulls remote changes. If offline or if
+#      local modifications conflict, it warns and proceeds with local files
+#      rather than crashing.
+# ==============================================================================
 
 if [[ "$SKIP_PULL" -eq 0 && "${UPDATE_REEXECED:-0}" -eq 0 ]]; then
+    # Verify this is a git repository and has a configured remote
     if git -C "$REPO_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
         if [[ -n "$(git -C "$REPO_DIR" remote 2>/dev/null)" ]]; then
             info "Checking for repository updates (git pull)..."
 
+            # Record commit hash before pull to detect if files changed
             HEAD_BEFORE="$(git -C "$REPO_DIR" rev-parse HEAD 2>/dev/null || echo "")"
 
             if git -C "$REPO_DIR" pull --ff-only 2>/dev/null || git -C "$REPO_DIR" pull 2>/dev/null; then
+                # Record commit hash after pull
                 HEAD_AFTER="$(git -C "$REPO_DIR" rev-parse HEAD 2>/dev/null || echo "")"
 
+                # If new commits were pulled, re-execute the fresh update.sh from disk
                 if [[ -n "$HEAD_BEFORE" && "$HEAD_BEFORE" != "$HEAD_AFTER" ]]; then
                     success "Repository updated to latest version."
                     info "Re-executing updater to apply new updates..."
@@ -85,6 +125,9 @@ if [[ "$SKIP_PULL" -eq 0 && "${UPDATE_REEXECED:-0}" -eq 0 ]]; then
         fi
     fi
 fi
+# ==============================================================================
+# END OF AUTO-UPDATE CORE MECHANISM
+# ==============================================================================
 
 if [[ ! -d "$SRC" ]]; then
     error "No .config directory found at $SRC"
