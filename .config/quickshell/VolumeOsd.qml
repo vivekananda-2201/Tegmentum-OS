@@ -1,11 +1,37 @@
 import Quickshell
 import Quickshell.Services.Pipewire
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import Quickshell.Io
 import QtQuick
 
 PanelWindow {
     id: root
+
+    function updateScreen() {
+        var mon = Hyprland.focusedMonitor
+        if (mon) {
+            var scr = Quickshell.screens.find(function (s) { return s.name === mon.name })
+            if (scr) {
+                root.screen = scr
+                return
+            }
+        }
+        if (Quickshell.screens.length > 0) {
+            root.screen = Quickshell.screens[0]
+        }
+    }
+
+    Component.onCompleted: root.updateScreen()
+
+    Connections {
+        target: Quickshell
+        function onScreensChanged() {
+            if (!Quickshell.screens.includes(root.screen)) {
+                root.updateScreen()
+            }
+        }
+    }
 
     anchors {
         top: true
@@ -64,6 +90,7 @@ PanelWindow {
     property bool hovered: flyoutArea.containsMouse || panelArea.containsMouse
 
     function showOsd() {
+        updateScreen()
         showing = true
         hideTimer.restart()
     }

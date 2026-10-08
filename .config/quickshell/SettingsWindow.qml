@@ -1,6 +1,7 @@
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import Quickshell.Services.Pipewire
 import QtQuick
 import "SettingsPages"
@@ -17,9 +18,45 @@ PanelWindow {
         item: root.showing ? backdrop : null
     }
     property bool showing: false
-    function show()   { showing = true }
+
+    function updateScreen() {
+        var mon = Hyprland.focusedMonitor
+        if (mon) {
+            var scr = Quickshell.screens.find(function (s) { return s.name === mon.name })
+            if (scr) {
+                root.screen = scr
+                return
+            }
+        }
+        if (Quickshell.screens.length > 0) {
+            root.screen = Quickshell.screens[0]
+        }
+    }
+
+    Component.onCompleted: root.updateScreen()
+
+    Connections {
+        target: Quickshell
+        function onScreensChanged() {
+            if (!Quickshell.screens.includes(root.screen)) {
+                root.updateScreen()
+            }
+        }
+    }
+
+    function show() {
+        updateScreen()
+        showing = true
+    }
     function hide()   { showing = false }
-    function toggle() { showing = !showing }
+    function toggle() {
+        if (!showing) {
+            updateScreen()
+            showing = true
+        } else {
+            showing = false
+        }
+    }
     
     property real cardMargin: 40
 

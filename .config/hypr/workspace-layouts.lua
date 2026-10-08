@@ -4,6 +4,6 @@
 
 hl.workspace_rule({ workspace = "1", layout = "dwindle" })
 hl.workspace_rule({ workspace = "2", layout = "dwindle" })
-hl.workspace_rule({ workspace = "6", layout = "dwindle" })
+hl.workspace_rule({ workspace = "6", layout = "scrolling" })
 hl.workspace_rule({ workspace = "7", layout = "scrolling" })
 hl.workspace_rule({ workspace = "8", layout = "dwindle" })

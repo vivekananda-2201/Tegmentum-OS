@@ -45,6 +45,9 @@ apply_close() {
         sleep 0.2
         hyprctl dispatch "hl.dsp.dpms(\"off\", \"$INTERNAL_MONITOR\")" >/dev/null 2>&1
     fi
+
+    # Ensure Quickshell remains running across display transitions
+    ensure_quickshell
 }
 
 apply_open() {
@@ -67,6 +70,15 @@ apply_open() {
     # If standalone laptop and hyprlock is not running, ensure screen is locked
     if [ "$EXTERNAL_COUNT" -eq 0 ] && ! pgrep -x hyprlock >/dev/null; then
         hyprlock &
+    fi
+
+    # Ensure Quickshell remains running across display transitions
+    ensure_quickshell
+}
+
+ensure_quickshell() {
+    if ! pgrep -x qs >/dev/null; then
+        systemd-run --user qs >/dev/null 2>&1 || (nohup qs >/dev/null 2>&1 &)
     fi
 }
 

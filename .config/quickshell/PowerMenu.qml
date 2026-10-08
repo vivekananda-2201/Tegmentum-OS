@@ -42,6 +42,31 @@ PanelWindow {
 
     mask: Region { item: root.showing ? menuRoot : null }
 
+    function updateScreen() {
+        var mon = Hyprland.focusedMonitor
+        if (mon) {
+            var scr = Quickshell.screens.find(function (s) { return s.name === mon.name })
+            if (scr) {
+                root.screen = scr
+                return
+            }
+        }
+        if (Quickshell.screens.length > 0) {
+            root.screen = Quickshell.screens[0]
+        }
+    }
+
+    Component.onCompleted: root.updateScreen()
+
+    Connections {
+        target: Quickshell
+        function onScreensChanged() {
+            if (!Quickshell.screens.includes(root.screen)) {
+                root.updateScreen()
+            }
+        }
+    }
+
     // Keep the card on screen whenever the size changes
     onMenuSizeChanged: if (root.showing) root.setPosition(root.offsetX, root.offsetY)
 
@@ -97,11 +122,7 @@ PanelWindow {
     }
 
     function openMenu() {
-        var mon = Hyprland.focusedMonitor
-        if (mon) {
-            var scr = Quickshell.screens.find(function (s) { return s.name === mon.name })
-            if (scr) root.screen = scr
-        }
+        root.updateScreen()
         currentIndex = 0
         settingsOpen = false
         dragging = false

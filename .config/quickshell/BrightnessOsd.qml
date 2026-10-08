@@ -1,10 +1,34 @@
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import Quickshell.Io
 import QtQuick
 
 PanelWindow {
     id: root
+
+    function updateScreen() {
+        var mon = Hyprland.focusedMonitor
+        if (mon) {
+            var scr = Quickshell.screens.find(function (s) { return s.name === mon.name })
+            if (scr) {
+                root.screen = scr
+                return
+            }
+        }
+        if (Quickshell.screens.length > 0) {
+            root.screen = Quickshell.screens[0]
+        }
+    }
+
+    Connections {
+        target: Quickshell
+        function onScreensChanged() {
+            if (!Quickshell.screens.includes(root.screen)) {
+                root.updateScreen()
+            }
+        }
+    }
 
     anchors {
         top: true
@@ -34,6 +58,7 @@ PanelWindow {
     property bool hovered: flyoutArea.containsMouse
 
     function showOsd() {
+        updateScreen()
         showing = true
         hideTimer.restart()
     }
@@ -71,6 +96,7 @@ PanelWindow {
     }
 
     Component.onCompleted: {
+        root.updateScreen()
         brightnessGet.running = true
     }
 

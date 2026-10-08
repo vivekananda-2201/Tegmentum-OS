@@ -1,6 +1,7 @@
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import Quickshell.Services.Notifications
 import Quickshell.Services.UPower
 import QtQuick
@@ -12,6 +13,29 @@ import QtQuick
 //  - battery low / critical alerts
 PanelWindow {
     id: root
+
+    function updateScreen() {
+        var mon = Hyprland.focusedMonitor
+        if (mon) {
+            var scr = Quickshell.screens.find(function (s) { return s.name === mon.name })
+            if (scr) {
+                root.screen = scr
+                return
+            }
+        }
+        if (Quickshell.screens.length > 0) {
+            root.screen = Quickshell.screens[0]
+        }
+    }
+
+    Connections {
+        target: Quickshell
+        function onScreensChanged() {
+            if (!Quickshell.screens.includes(root.screen)) {
+                root.updateScreen()
+            }
+        }
+    }
 
     // ---- tweakables ----
     property int topGap: 50          // distance from the top (clear your bar)
@@ -73,9 +97,12 @@ PanelWindow {
         target: "notifications"
 
         function toggle(): void {
+            if (!root.panelOpen)
+                root.updateScreen();
             root.panelOpen = !root.panelOpen;
         }
         function open(): void {
+            root.updateScreen();
             root.panelOpen = true;
         }
         function close(): void {
@@ -148,6 +175,8 @@ PanelWindow {
         imageSupported: true
 
         onNotification: n => {
+            if (!root.panelOpen)
+                root.updateScreen();
             n.tracked = true;
 
             if (n.transient)
@@ -225,7 +254,10 @@ PanelWindow {
         lastBatteryPercentage = percentage;
     }
 
-    Component.onCompleted: checkBattery()
+    Component.onCompleted: {
+        root.updateScreen();
+        checkBattery();
+    }
 
     Connections {
         target: UPower.displayDevice
