@@ -17,6 +17,9 @@ hl.on("hyprland.start", function()
 	systemd_env = "systemctl --user set-environment QT_QPA_PLATFORM=wayland QT_QPA_PLATFORMTHEME=xdgdesktopportal"
 	hl.exec_cmd(systemd_env)
 
+	-- Check initial lid and monitor state (handles starting session with lid closed)
+	hl.exec_cmd("bash " .. os.getenv("HOME") .. "/.config/hypr/scripts/lid-handler.sh check")
+
 	-- Replaced by Quickshell native Bar and Notifications
 	-- hl.exec_cmd("waybar")
 	-- hl.exec_cmd("dunst")
@@ -28,6 +31,11 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("awww-daemon")
 	hl.exec_cmd("sleep 1 && qs")
 	hl.exec_cmd("systemd-inhibit --what=handle-lid-switch --who=Hyprland --why='Handled by Hyprland' --mode=block sleep infinity")
+end)
+
+-- Re-check clamshell / lid state whenever displays are connected or disconnected
+hl.on("monitor.layout_changed", function()
+	hl.exec_cmd("bash " .. os.getenv("HOME") .. "/.config/hypr/scripts/lid-handler.sh check")
 end)
 
 ---- ENVIRONMENT VARIABLES ----

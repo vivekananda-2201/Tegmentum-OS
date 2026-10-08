@@ -93,3 +93,5 @@ theme() { python3 "$HOME/.config/tegmentum/bin/theme.py" "$@"; }
 export QT_QPA_PLATFORM=wayland
 export QT_QPA_PLATFORMTHEME=xdgdesktopportal
 
+# User binaries & CLI tools (agy, agen, battery, etc.)
+export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
