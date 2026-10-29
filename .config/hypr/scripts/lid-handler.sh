@@ -6,7 +6,6 @@ ACTION="${1:-check}"
 
 # Startup grace period: ignore disruptive lid switch events during early boot
 UPTIME_SEC=$(awk '{print int($1)}' /proc/uptime 2>/dev/null || echo 999)
-
 # Read hardware ACPI lid state if available ('open' or 'closed')
 HW_LID_STATE=$(grep -oE 'open|closed' /proc/acpi/button/lid/*/state 2>/dev/null | head -n 1)
 
