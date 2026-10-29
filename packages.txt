@@ -8,9 +8,8 @@
 
 hyprland
 hyprlock
-wlogout
+sddm
 quickshell
-waybar
 rofi
 polkit-kde-agent
 
@@ -39,7 +38,7 @@ python
 # --------------------------------------------------
 
 networkmanager
-nm-applet
+network-manager-applet
 bluez
 bluez-utils
 
@@ -129,13 +128,15 @@ cmatrix
 
 ttf-jetbrains-mono-nerd
 ttf-iosevka-nerd
-ttf-font-awesome
+otf-font-awesome
 ttf-roboto-mono
 
 # --------------------------------------------------
 # Package / Application Utilities
 # --------------------------------------------------
 
+libnotify
+jq
 flatpak
 curl
 unzip
