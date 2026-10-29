@@ -43,7 +43,7 @@ apply_close() {
             hyprlock &
         fi
         sleep 0.2
-        hyprctl dispatch "hl.dsp.dpms(\"off\", \"$INTERNAL_MONITOR\")" >/dev/null 2>&1
+        hyprctl eval "hl.dispatch(hl.dsp.dpms({ state = false, monitor = '$INTERNAL_MONITOR' }))" >/dev/null 2>&1
     fi
 
     # Ensure Quickshell remains running across display transitions
@@ -52,7 +52,7 @@ apply_close() {
 
 apply_open() {
     # Turn internal monitor backlight on
-    hyprctl dispatch "hl.dsp.dpms(\"on\", \"$INTERNAL_MONITOR\")" >/dev/null 2>&1
+    hyprctl eval "hl.dispatch(hl.dsp.dpms({ state = true, monitor = '$INTERNAL_MONITOR' }))" >/dev/null 2>&1
 
     # Re-enable the internal monitor if it was disabled
     if [ "$INTERNAL_DISABLED" -eq 1 ]; then
@@ -65,11 +65,6 @@ apply_open() {
         else
             hyprctl eval "hl.monitor({ output = '$INTERNAL_MONITOR', mode = 'preferred', position = 'auto', scale = 1.2 })" >/dev/null 2>&1
         fi
-    fi
-
-    # If standalone laptop and hyprlock is not running, ensure screen is locked
-    if [ "$EXTERNAL_COUNT" -eq 0 ] && ! pgrep -x hyprlock >/dev/null; then
-        hyprlock &
     fi
 
     # Ensure Quickshell remains running across display transitions

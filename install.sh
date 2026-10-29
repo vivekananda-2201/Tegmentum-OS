@@ -316,10 +316,20 @@ HandleLidSwitchDocked=ignore
 EOF
 
     if systemctl is-active --quiet systemd-logind 2>/dev/null; then
-        sudo systemctl restart systemd-logind || true
+        sudo systemctl reload systemd-logind || true
     fi
 
     success "Lid behavior configured."
+fi
+
+# --------------------------------------------------
+# Display manager (SDDM)
+# --------------------------------------------------
+
+if command -v systemctl >/dev/null 2>&1; then
+    info "Enabling SDDM display manager..."
+    sudo systemctl enable sddm.service 2>/dev/null || true
+    success "SDDM configured as default display manager."
 fi
 
 # --------------------------------------------------
