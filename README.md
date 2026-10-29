@@ -70,6 +70,7 @@
 | <kbd>Super</kbd> + <kbd>Esc</kbd> | Power Menu (Top-Right) |
 | <kbd>Super</kbd> + <kbd>W</kbd> | Close Active Window |
 | <kbd>Super</kbd> + <kbd>B</kbd> | Hide / Restore Floating Windows |
+| <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> | Launch Web Browser (Firefox) |
 | <kbd>Super</kbd> + <kbd>E</kbd> | File Manager (Nautilus) |
 | <kbd>Super</kbd> + <kbd>F</kbd> | Toggle Fullscreen (Entire Screen) |
 | <kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>F</kbd> | Toggle Full Window (Maximize / Tiled Fullscreen) |
@@ -85,7 +86,7 @@
 | <kbd>Super</kbd> + <kbd>Tab</kbd> | Lock Session (Hyprlock) |
 | <kbd>Super</kbd> + <kbd>I</kbd> | Open System Settings |
 | <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>W</kbd> | Open Wallpaper Selector |
-| <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>Space</kbd> | Toggle Waybar Visibility |
+| <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>Space</kbd> | Toggle Top Bar Visibility |
 | <kbd>Super</kbd> + <kbd>V</kbd> | Clipboard History |
 | <kbd>Print</kbd> | Fullscreen Screenshot |
 | <kbd>Shift</kbd> + <kbd>Print</kbd> | Region Screenshot |

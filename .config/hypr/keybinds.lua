@@ -10,7 +10,7 @@ local menu = "rofi -show drun"
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + Space", hl.dsp.exec_cmd("pgrep -x rofi >/dev/null && pkill -x rofi || " .. menu))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
-hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser))
+hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd(browser), { description = "Open the browser" })
 hl.bind(mainMod .. " + W", hl.dsp.window.close())
 
 hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd("hyprlock")) -- Lock screen
@@ -361,7 +361,7 @@ hl.bind(
 
 hl.bind(
 	mainMod .. " + B",
-	hl.dsp.exec_cmd("bash " .. os.getenv("HOME") .. "/.config/hypr/scripts/toggle-floats.sh"),
+	hl.dsp.exec_cmd("python3 " .. os.getenv("HOME") .. "/.config/hypr/scripts/toggle-floats.py"),
 	{ description = "Hide/unhide floating windows" }
 )
 

@@ -6,7 +6,7 @@ hl.layer_rule({
 	ignore_alpha = 0.15,
 })
 
--- Opacity rules: 90% for all windows except fullscreen
+-- Window opacity
 hl.window_rule({
 	match = { class = ".*" },
 	opacity = "1.0 override",
@@ -15,11 +15,6 @@ hl.window_rule({
 hl.window_rule({
 	match = { class = "^(kitty|floating-terminal)$" },
 	suppress_event = "maximize",
-})
-
-hl.window_rule({
-	match = { class = ".*", fullscreen = true },
-	opacity = "1.0 override",
 })
 
 hl.window_rule({

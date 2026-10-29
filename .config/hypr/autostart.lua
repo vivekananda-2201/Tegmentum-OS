@@ -1,10 +1,6 @@
 -- Extra autostart processes.
--- o.launch_on_start("my-service")
+-- hl.exec_cmd("my-service")
 
 hl.on("hyprland.start", function()
-	-- Your other startup apps (waybar, hyprpaper, etc.)
-
-	-- Start the floating terminal
-	os.execute("sleep 2")
-	hl.exec_cmd("kitty --class floating-terminal")
+	-- Extra startup applications can be placed here
 end)

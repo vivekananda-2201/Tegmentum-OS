@@ -7,7 +7,7 @@ mainMod = "SUPER"
 terminal = "kitty"
 menu = "rofi -show drun"
 fileManager = "nautilus --new-window"
-browser = "brave"
+browser = "firefox"
 
 ---- AUTOSTART ----
 
