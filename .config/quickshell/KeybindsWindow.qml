@@ -136,6 +136,7 @@ PanelWindow {
         { keys: "SUPER + CTRL + RETURN", desc: "Open floating terminal", category: "Launchers" },
         { keys: "SUPER + SPACE", desc: "Application launcher (rofi)", category: "Launchers" },
         { keys: "SUPER + E", desc: "Open file manager (nautilus)", category: "Launchers" },
+        { keys: "SUPER + SHIFT + B", desc: "Launch web browser (firefox)", category: "Launchers" },
         { keys: "SUPER + B", desc: "Hide / unhide floating windows", category: "Windows" },
         { keys: "SUPER + W", desc: "Close focused window", category: "Windows" },
         { keys: "SUPER + F", desc: "Toggle window fullscreen (entire screen)", category: "Windows" },

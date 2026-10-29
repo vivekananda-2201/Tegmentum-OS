@@ -14,10 +14,12 @@ Item {
     property real sectionSpacing: 6
 
     function editConfig(path) {
+        const fullPath = path.replace(/^~/, Quickshell.env("HOME"));
         Quickshell.execDetached([
-            "xed",
-            path.replace(/^~/, Quickshell.env("HOME"))
-        ])
+            "sh", "-c",
+            'if command -v xed >/dev/null 2>&1; then xed "$1"; elif command -v gnome-text-editor >/dev/null 2>&1; then gnome-text-editor "$1"; elif [ -n "$EDITOR" ]; then kitty -e "$EDITOR" "$1"; else kitty -e nvim "$1"; fi',
+            "_", fullPath
+        ]);
     }
 
     component ConfigButton: Rectangle {
@@ -178,7 +180,7 @@ Item {
             }
 
             Text {
-                text: "WAYBAR"
+                text: "QUICKSHELL"
                 color: Theme.text
                 font.family: Theme.fontFamily
                 font.pixelSize: 16
@@ -196,42 +198,13 @@ Item {
                 spacing: page.sectionSpacing
 
                 ConfigButton {
-                    label: "CONFIG"
-                    path: "~/.config/waybar/config.jsonc"
+                    label: "TOP BAR"
+                    path: "~/.config/quickshell/Bar.qml"
                 }
 
                 ConfigButton {
-                    label: "STYLE"
-                    path: "~/.config/waybar/style.css"
-                }
-            }
-
-            Text {
-                text: "WLOGOUT"
-                color: Theme.text
-                font.family: Theme.fontFamily
-                font.pixelSize: 16
-                font.letterSpacing: 3
-            }
-
-            Rectangle {
-                width: parent.width
-                height: 1
-                color: Theme.border
-            }
-
-            Column {
-                width: parent.width
-                spacing: page.sectionSpacing
-
-                ConfigButton {
-                    label: "STYLE"
-                    path: "~/.config/wlogout/style.css"
-                }
-
-                ConfigButton {
-                    label: "LAYOUT"
-                    path: "~/.config/wlogout/layout"
+                    label: "SHELL ROOT"
+                    path: "~/.config/quickshell/shell.qml"
                 }
             }
             Text {
@@ -270,7 +243,7 @@ Item {
                 width: parent.width
                 spacing: page.sectionSpacing
                 ConfigButton {
-                    label: "COLORS - TEAKS"
+                    label: "COLORS - TWEAKS"
                     path: "~/.config/quickshell/Theme.qml"
                 }
             }

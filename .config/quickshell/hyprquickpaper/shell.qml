@@ -1,5 +1,6 @@
 import Quickshell
 import Quickshell.Io
+import Quickshell.Hyprland
 import QtQuick
 import QtQuick.Effects
 import Qt.labs.folderlistmodel
@@ -7,6 +8,29 @@ import Quickshell.Wayland
 
 PanelWindow {
     id: main
+
+    function updateScreen() {
+        var mon = Hyprland.focusedMonitor
+        if (mon) {
+            var scr = Quickshell.screens.find(function (s) { return s.name === mon.name })
+            if (scr) {
+                main.screen = scr
+                return
+            }
+        }
+        if (Quickshell.screens.length > 0) {
+            main.screen = Quickshell.screens[0]
+        }
+    }
+
+    Connections {
+        target: Quickshell
+        function onScreensChanged() {
+            if (!Quickshell.screens.includes(main.screen)) {
+                main.updateScreen()
+            }
+        }
+    }
 
     property int speed: 5000
     property int animDuration: 250
@@ -58,8 +82,7 @@ PanelWindow {
         }
     }
 
-    implicitHeight: Screen.height
-    implicitWidth: Screen.width
+    anchors { top: true; left: true; right: true; bottom: true }
     color: "transparent"
     aboveWindows: true
     exclusionMode: "Ignore"
@@ -68,6 +91,7 @@ PanelWindow {
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
     Component.onCompleted: {
+        main.updateScreen()
         Quickshell.execDetached(["bash", Quickshell.shellPath("cache.sh"), Quickshell.shellDir])
         list.forceActiveFocus()
     }

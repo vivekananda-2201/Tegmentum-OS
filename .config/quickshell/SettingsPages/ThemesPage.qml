@@ -15,11 +15,14 @@ Item {
     function runTheme(themeName) {
         console.log("Running theme:", themeName)
 
-        Quickshell.execDetached([
-            "python3",
-            Quickshell.env("HOME") + "/.config/tegmentum/bin/theme.py",
-            themeName
-        ])
+        let args = ["python3", Quickshell.env("HOME") + "/.config/tegmentum/bin/theme.py"]
+        if (themeName === "default") {
+            args.push("default")
+        } else {
+            args.push("preset", themeName)
+        }
+
+        Quickshell.execDetached(args)
     }
 
     component ThemeButton: Rectangle {
