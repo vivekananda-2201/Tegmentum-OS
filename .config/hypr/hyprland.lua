@@ -29,7 +29,7 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("/usr/lib/polkit-kde-authentication-agent-1")
 
 	hl.exec_cmd("awww-daemon")
-	hl.exec_cmd("sleep 1 && qs")
+	hl.exec_cmd("sleep 1 && bash " .. os.getenv("HOME") .. "/.config/hypr/scripts/launch-quickshell.sh")
 	hl.exec_cmd("systemd-inhibit --what=handle-lid-switch --who=Hyprland --why='Handled by Hyprland' --mode=block sleep infinity")
 end)
 

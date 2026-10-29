@@ -4,6 +4,9 @@
 
 ACTION="${1:-check}"
 
+# Startup grace period: ignore disruptive lid switch events during early boot
+UPTIME_SEC=$(awk '{print int($1)}' /proc/uptime 2>/dev/null || echo 999)
+
 # Read hardware ACPI lid state if available ('open' or 'closed')
 HW_LID_STATE=$(grep -oE 'open|closed' /proc/acpi/button/lid/*/state 2>/dev/null | head -n 1)
 
@@ -72,16 +75,27 @@ apply_open() {
 }
 
 ensure_quickshell() {
-    if ! pgrep -x qs >/dev/null; then
-        systemd-run --user qs >/dev/null 2>&1 || (nohup qs >/dev/null 2>&1 &)
+    LAUNCH_SCRIPT="$HOME/.config/hypr/scripts/launch-quickshell.sh"
+    if [ -x "$LAUNCH_SCRIPT" ]; then
+        "$LAUNCH_SCRIPT"
+    elif ! pgrep -x qs >/dev/null 2>&1; then
+        systemctl --user reset-failed quickshell >/dev/null 2>&1 || true
+        systemd-run --user --unit=quickshell qs >/dev/null 2>&1 || (nohup qs >/dev/null 2>&1 &)
     fi
 }
 
 case "$ACTION" in
     close)
+        # Prevent synthetic switch events from blanking the screen on startup or when the lid is actually open
+        if [ "$UPTIME_SEC" -lt 15 ] || [ "$HW_LID_STATE" = "open" ]; then
+            exit 0
+        fi
         apply_close
         ;;
     open)
+        if [ "$HW_LID_STATE" = "closed" ]; then
+            exit 0
+        fi
         apply_open
         ;;
     check|init)
