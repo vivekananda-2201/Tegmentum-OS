@@ -198,7 +198,6 @@ def apply_palette(pal):
     stage = Path(tempfile.mkdtemp(prefix=".stage-", dir=CACHE))
     hooks = []
     render_vars = dict(pal)
-    render_vars["icon_dir"] = str(HOME / ".config" / "wlogout" / "icons")
     render_vars["icon_suffix"] = "2" if current_mode() == "light" else ""
     try:
         staged = []

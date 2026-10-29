@@ -1,1 +1,6 @@
 .config/quickshell/state/
+*.log
+*.pyc
+__pycache__/
+*.bak
+.DS_Store

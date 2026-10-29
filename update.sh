@@ -279,7 +279,7 @@ fi
 if command -v python3 >/dev/null 2>&1; then
     info "Regenerating theme from current palette..."
     if python3 "$CONFIG_DIR/tegmentum/bin/theme.py" apply; then
-        success "Theme regenerated and consumers reloaded (Kitty, Waybar)."
+        success "Theme regenerated and consumers reloaded (Kitty, Quickshell)."
     else
         error "Theme regeneration failed — check the error above."
         error "Configs on disk may be a mix of old and new; run 'theme apply' again once fixed."
@@ -295,7 +295,7 @@ fi
 
 printf '\n'
 warning "GTK apps (Thunar) cache colors per-process. If Thunar looks stale: thunar -q && thunar"
-warning "Rofi and wlogout re-read their CSS on next launch — no action needed."
+warning "Rofi and Quickshell components re-read their styles automatically."
 warning "Hyprlock re-reads its config on next lock — no action needed."
 
 if [[ "$RESTART_SHELL" -eq 1 ]]; then
