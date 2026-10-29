@@ -11,6 +11,16 @@ browser = "firefox"
 
 ---- AUTOSTART ----
 
+local function isLidClosed()
+	local p = io.popen("grep -oE 'open|closed' /proc/acpi/button/lid/*/state 2>/dev/null | head -n 1")
+	if p then
+		local s = p:read("*l")
+		p:close()
+		return s == "closed"
+	end
+	return false
+end
+
 hl.on("hyprland.start", function()
 	-- Sync DBus and systemd activation environment
 	hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP QT_QPA_PLATFORM QT_QPA_PLATFORMTHEME")
@@ -18,13 +28,8 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd(systemd_env)
 
 	-- Check initial lid and monitor state only if starting session with lid closed (docked clamshell)
-	local lidF = io.open("/proc/acpi/button/lid/LID0/state", "r")
-	if lidF then
-		local lidContent = lidF:read("*all")
-		lidF:close()
-		if lidContent:find("closed") then
-			hl.exec_cmd("bash " .. os.getenv("HOME") .. "/.config/hypr/scripts/lid-handler.sh check")
-		end
+	if isLidClosed() then
+		hl.exec_cmd("bash " .. os.getenv("HOME") .. "/.config/hypr/scripts/lid-handler.sh check")
 	end
 
 	-- Replaced by Quickshell native Bar and Notifications
@@ -42,13 +47,8 @@ end)
 
 -- Re-check clamshell state when displays change, only if lid is closed
 hl.on("monitor.layout_changed", function()
-	local lidF = io.open("/proc/acpi/button/lid/LID0/state", "r")
-	if lidF then
-		local lidContent = lidF:read("*all")
-		lidF:close()
-		if lidContent:find("closed") then
-			hl.exec_cmd("bash " .. os.getenv("HOME") .. "/.config/hypr/scripts/lid-handler.sh check")
-		end
+	if isLidClosed() then
+		hl.exec_cmd("bash " .. os.getenv("HOME") .. "/.config/hypr/scripts/lid-handler.sh check")
 	end
 end)
 
