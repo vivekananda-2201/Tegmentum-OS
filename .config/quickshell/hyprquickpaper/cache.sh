@@ -46,7 +46,11 @@ while read -r img; do
     fi
 
     echo "Generating thumbnail for $filename"
-    "$CONV_CMD" "$img" -thumbnail x500 -strip -quality 85 "$out" &
+    if [[ "$img" == *.gif || "$img" == *.GIF ]]; then
+        "$CONV_CMD" "${img}[0]" -thumbnail x500 -strip -quality 85 "$out" &
+    else
+        "$CONV_CMD" "$img" -thumbnail x500 -strip -quality 85 "$out" &
+    fi
 
     if (( cache_batch_size > 0 )); then
         while (( $(jobs -rp | wc -l) >= cache_batch_size )); do
@@ -57,7 +61,8 @@ done < <(find "$wallpaper_path" -type f \( \
     -iname "*.jpg" -o \
     -iname "*.jpeg" -o \
     -iname "*.png" -o \
-    -iname "*.webp" \
+    -iname "*.webp" -o \
+    -iname "*.gif" \
 \))
 
 wait

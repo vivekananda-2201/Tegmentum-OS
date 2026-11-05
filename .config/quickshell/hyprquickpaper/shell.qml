@@ -181,7 +181,7 @@ PanelWindow {
         folder: "file://" + main.baseWallpaperPath
         showDirs: false
         showFiles: true
-        nameFilters: ["*.png", "*.jpg", "*.jpeg", "*.webp"]
+        nameFilters: ["*.png", "*.jpg", "*.jpeg", "*.webp", "*.gif", "*.PNG", "*.JPG", "*.JPEG", "*.WEBP", "*.GIF"]
         onStatusChanged: {
             if (status === FolderListModel.Ready && subDirModel.status === FolderListModel.Ready) {
                 main.rebuildDirectoryList()
@@ -261,7 +261,7 @@ PanelWindow {
         id: folderModel
         folder: "file://" + main.currentDirectoryPath
         showDirs: false
-        nameFilters: ["*.png", "*.jpg", "*.jpeg", "*.webp"]
+        nameFilters: ["*.png", "*.jpg", "*.jpeg", "*.webp", "*.gif", "*.PNG", "*.JPG", "*.JPEG", "*.WEBP", "*.GIF"]
         sortField: FolderListModel.Name
         onStatusChanged: {
             if (status === FolderListModel.Ready) {
