@@ -46,11 +46,19 @@ while read -r img; do
     fi
 
     echo "Generating thumbnail for $filename"
-    if [[ "$img" == *.gif || "$img" == *.GIF ]]; then
-        "$CONV_CMD" "${img}[0]" -thumbnail x500 -strip -quality 85 "$out" &
-    else
-        "$CONV_CMD" "$img" -thumbnail x500 -strip -quality 85 "$out" &
-    fi
+    ext="${filename##*.}"
+    ext_lower="$(echo "$ext" | tr '[:upper:]' '[:lower:]')"
+    case "$ext_lower" in
+        mp4|webm|mkv|mov)
+            ffmpeg -y -i "$img" -vframes 1 -vf "scale=-1:500" -q:v 2 -f image2 -update 1 "$out" -loglevel error 2>/dev/null &
+            ;;
+        gif)
+            "$CONV_CMD" "${img}[0]" -thumbnail x500 -strip -quality 85 "$out" &
+            ;;
+        *)
+            "$CONV_CMD" "$img" -thumbnail x500 -strip -quality 85 "$out" &
+            ;;
+    esac
 
     if (( cache_batch_size > 0 )); then
         while (( $(jobs -rp | wc -l) >= cache_batch_size )); do
@@ -62,7 +70,11 @@ done < <(find "$wallpaper_path" -type f \( \
     -iname "*.jpeg" -o \
     -iname "*.png" -o \
     -iname "*.webp" -o \
-    -iname "*.gif" \
+    -iname "*.gif" -o \
+    -iname "*.mp4" -o \
+    -iname "*.webm" -o \
+    -iname "*.mkv" -o \
+    -iname "*.mov" \
 \))
 
 wait

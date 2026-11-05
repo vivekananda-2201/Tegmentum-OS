@@ -27,6 +27,7 @@ xsettingsd
 # --------------------------------------------------
 
 awww
+mpvpaper
 grim
 slurp
 imagemagick
