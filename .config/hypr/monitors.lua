@@ -13,6 +13,6 @@ hl.monitor({
 hl.monitor({
 	output = "",
 	mode = "preferred",
-	position = "auto",
+	position = "auto-right",
 	scale = "auto",
 })

@@ -323,13 +323,105 @@ EOF
 fi
 
 # --------------------------------------------------
-# Display manager (SDDM)
+# Display manager (SDDM) & Multi-monitor Clamshell
 # --------------------------------------------------
 
 if command -v systemctl >/dev/null 2>&1; then
-    info "Enabling SDDM display manager..."
+    info "Configuring SDDM display manager and multi-monitor setup..."
+
     sudo systemctl enable sddm.service 2>/dev/null || true
-    success "SDDM configured as default display manager."
+
+    # SDDM display setup script (PRIME offloading + clamshell external display support)
+    if [[ -d /usr/share/sddm/scripts ]]; then
+        sudo tee /usr/share/sddm/scripts/Xsetup >/dev/null << 'EOF'
+#!/usr/bin/env bash
+# /usr/share/sddm/scripts/Xsetup
+# Run as root before the login dialog appears in SDDM
+
+if command -v xrandr >/dev/null 2>&1; then
+    xrandr --setprovideroutputsource modesetting NVIDIA-G0 2>/dev/null || \
+    xrandr --setprovideroutputsource modesetting NVIDIA-0 2>/dev/null || \
+    xrandr --setprovideroutputsource 1 0 2>/dev/null || true
+
+    HW_LID=$(grep -oE "open|closed" /proc/acpi/button/lid/*/state 2>/dev/null | head -n 1)
+    INTERNAL=$(xrandr --query 2>/dev/null | grep -E "^eDP[0-9-]* connected" | awk '{print $1}' | head -n 1)
+    EXTERNALS=$(xrandr --query 2>/dev/null | grep " connected" | awk '{print $1}' | grep -v "^eDP")
+    FIRST_EXTERNAL=$(echo "$EXTERNALS" | head -n 1)
+
+    if [ "$HW_LID" = "closed" ] && [ -n "$FIRST_EXTERNAL" ]; then
+        if [ -n "$INTERNAL" ]; then
+            xrandr --output "$INTERNAL" --off
+        fi
+        for ext in $EXTERNALS; do
+            xrandr --output "$ext" --primary --auto
+        done
+    elif [ -n "$INTERNAL" ] && [ -n "$FIRST_EXTERNAL" ]; then
+        xrandr --output "$INTERNAL" --primary --auto
+        for ext in $EXTERNALS; do
+            xrandr --output "$ext" --auto --right-of "$INTERNAL"
+        done
+    else
+        xrandr --auto
+    fi
+fi
+EOF
+        sudo chmod +x /usr/share/sddm/scripts/Xsetup
+    fi
+
+    # Check lid state before starting SDDM (skips headless startup if lid closed and no external monitors)
+    sudo tee /usr/local/bin/check-lid-before-sddm.sh >/dev/null << 'EOF'
+#!/usr/bin/env bash
+if [ -f /tmp/force-gui ]; then
+    rm -f /tmp/force-gui
+    exit 0
+fi
+
+for f in /sys/class/drm/*-*/status; do
+    conn_dir=$(basename "$(dirname "$f")")
+    conn="${conn_dir#*-}"
+    if [[ "$conn" == eDP* ]]; then
+        continue
+    fi
+    if grep -q "^connected" "$f" 2>/dev/null; then
+        exit 0
+    fi
+done
+
+if grep -q "closed" /proc/acpi/button/lid/*/state 2>/dev/null; then
+    exit 1
+fi
+
+exit 0
+EOF
+    sudo chmod +x /usr/local/bin/check-lid-before-sddm.sh
+
+    sudo mkdir -p /etc/systemd/system/sddm.service.d
+    sudo tee /etc/systemd/system/sddm.service.d/lid-check.conf >/dev/null << 'EOF'
+[Service]
+ExecCondition=/usr/local/bin/check-lid-before-sddm.sh
+EOF
+
+    # Udev hotplug rule for SDDM display changes
+    sudo tee /usr/local/bin/sddm-udev-display.sh >/dev/null << 'EOF'
+#!/usr/bin/env bash
+if pgrep -x Hyprland >/dev/null || ! pgrep -x sddm >/dev/null; then
+    exit 0
+fi
+XAUTH=$(ls /run/sddm/xauth_* 2>/dev/null | head -n 1)
+if [ -n "$XAUTH" ]; then
+    export DISPLAY=:0
+    export XAUTHORITY="$XAUTH"
+    /usr/share/sddm/scripts/Xsetup >/dev/null 2>&1
+fi
+EOF
+    sudo chmod +x /usr/local/bin/sddm-udev-display.sh
+
+    sudo tee /etc/udev/rules.d/99-sddm-display.rules >/dev/null << 'EOF'
+ACTION=="change", SUBSYSTEM=="drm", RUN+="/usr/local/bin/sddm-udev-display.sh"
+EOF
+    sudo udevadm control --reload-rules 2>/dev/null || true
+
+    success "SDDM configured with multi-monitor and clamshell support."
 fi
 
 # --------------------------------------------------

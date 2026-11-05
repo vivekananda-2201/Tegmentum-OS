@@ -20,6 +20,7 @@ polkit-kde-agent
 xdg-desktop-portal-hyprland
 xdg-desktop-portal-gtk
 xorg-xwayland
+xorg-xrandr
 xsettingsd
 
 # --------------------------------------------------

@@ -46,9 +46,12 @@ hl.on("hyprland.start", function()
 end)
 
 -- Re-check clamshell state and adapt shell when displays change
-hl.on("monitor.layout_changed", function()
+local function onDisplayChange()
 	hl.exec_cmd("bash " .. os.getenv("HOME") .. "/.config/hypr/scripts/lid-handler.sh check")
-end)
+end
+hl.on("monitor.layout_changed", onDisplayChange)
+hl.on("monitor.added", onDisplayChange)
+hl.on("monitor.removed", onDisplayChange)
 
 ---- ENVIRONMENT VARIABLES ----
 
