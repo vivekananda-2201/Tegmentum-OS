@@ -602,6 +602,7 @@ Scope {
                         baseSize: 12
                         text: (root.batCharging ? "\uf0e7 " : "") + root.batIcon + "  " + root.batPct + "%"
                         color: root.batLow ? Theme.danger : Theme.text
+                        onClicked: root.run("bash $HOME/.config/hypr/scripts/toggle-power-profile.sh")
                     }
 
                     // Power

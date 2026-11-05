@@ -4,7 +4,7 @@
 ---- MY PROGRAMS ----
 
 mainMod = "SUPER"
-terminal = "kitty"
+terminal = "kitty -1"
 menu = "rofi -show drun"
 fileManager = "nautilus --new-window"
 browser = "firefox"
