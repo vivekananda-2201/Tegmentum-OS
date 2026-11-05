@@ -3,7 +3,7 @@
 hl.config({ render = { expand_undersized_textures = false } })
 hl.config({
 	general = {
-		gaps_in = 4,
+		gaps_in = 3,
 		gaps_out = {
 			top = 6,
 			right = 6,

@@ -31,6 +31,15 @@ INTERNAL_MONITOR="${INTERNAL_MONITOR:-eDP-1}"
 INTERNAL_DISABLED="${INTERNAL_DISABLED:-0}"
 EXTERNAL_COUNT="${EXTERNAL_COUNT:-0}"
 
+# Track display state to prevent redundant modesetting or shell restarts
+STATE_FILE="${XDG_RUNTIME_DIR:-/tmp}/hypr-display-state"
+PREV_STATE=$(cat "$STATE_FILE" 2>/dev/null || echo "")
+CURR_STATE="${INTERNAL_DISABLED}:${EXTERNAL_COUNT}:${HW_LID_STATE}"
+
+save_state() {
+    echo "$CURR_STATE" > "$STATE_FILE" 2>/dev/null || true
+}
+
 apply_close() {
     if [ "$EXTERNAL_COUNT" -gt 0 ]; then
         # Clamshell mode with external display connected:
@@ -38,6 +47,10 @@ apply_close() {
         # and windows to the active external monitor(s) seamlessly.
         if [ "$INTERNAL_DISABLED" -ne 1 ]; then
             hyprctl eval "hl.monitor({ output = '$INTERNAL_MONITOR', disabled = true })" >/dev/null 2>&1
+            sleep 0.2
+            ensure_quickshell --restart
+        else
+            ensure_quickshell
         fi
     else
         # Standalone laptop: lock session first, then turn off display backlight
@@ -48,8 +61,7 @@ apply_close() {
         hyprctl eval "hl.dispatch(hl.dsp.dpms({ state = false, monitor = '$INTERNAL_MONITOR' }))" >/dev/null 2>&1
     fi
 
-    # Ensure Quickshell remains running across display transitions
-    ensure_quickshell
+    save_state
 }
 
 apply_open() {
@@ -67,19 +79,29 @@ apply_open() {
         else
             hyprctl eval "hl.monitor({ output = '$INTERNAL_MONITOR', mode = 'preferred', position = 'auto', scale = 1.2 })" >/dev/null 2>&1
         fi
+        sleep 0.2
+        ensure_quickshell --restart
+    else
+        # If external display count changed while lid remained open, refresh quickshell surfaces
+        if [ "$PREV_STATE" != "" ] && [ "$CURR_STATE" != "$PREV_STATE" ]; then
+            sleep 0.2
+            ensure_quickshell --restart
+        else
+            ensure_quickshell
+        fi
     fi
 
-    # Ensure Quickshell remains running across display transitions
-    ensure_quickshell
+    save_state
 }
 
 ensure_quickshell() {
     LAUNCH_SCRIPT="$HOME/.config/hypr/scripts/launch-quickshell.sh"
     if [ -x "$LAUNCH_SCRIPT" ]; then
-        "$LAUNCH_SCRIPT"
+        "$LAUNCH_SCRIPT" "$@"
+    elif [ "$1" = "--restart" ]; then
+        systemctl --user restart quickshell >/dev/null 2>&1 || (pkill -x qs; qs >/dev/null 2>&1 &)
     elif ! pgrep -x qs >/dev/null 2>&1; then
-        systemctl --user reset-failed quickshell >/dev/null 2>&1 || true
-        systemd-run --user --unit=quickshell qs >/dev/null 2>&1 || (nohup qs >/dev/null 2>&1 &)
+        systemctl --user start quickshell >/dev/null 2>&1 || systemd-run --user --unit=quickshell qs >/dev/null 2>&1 || (nohup qs >/dev/null 2>&1 &)
     fi
 }
 
@@ -98,6 +120,10 @@ case "$ACTION" in
         apply_open
         ;;
     check|init)
+        # Avoid early boot modesetting collision if starting up with lid open
+        if [ "$UPTIME_SEC" -lt 15 ] && [ "$HW_LID_STATE" = "open" ]; then
+            exit 0
+        fi
         if [ "$HW_LID_STATE" = "closed" ]; then
             apply_close
         else

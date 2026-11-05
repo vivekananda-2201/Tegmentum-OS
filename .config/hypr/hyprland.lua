@@ -45,11 +45,9 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("systemd-inhibit --what=handle-lid-switch --who=Hyprland --why='Handled by Hyprland' --mode=block sleep infinity")
 end)
 
--- Re-check clamshell state when displays change, only if lid is closed
+-- Re-check clamshell state and adapt shell when displays change
 hl.on("monitor.layout_changed", function()
-	if isLidClosed() then
-		hl.exec_cmd("bash " .. os.getenv("HOME") .. "/.config/hypr/scripts/lid-handler.sh check")
-	end
+	hl.exec_cmd("bash " .. os.getenv("HOME") .. "/.config/hypr/scripts/lid-handler.sh check")
 end)
 
 ---- ENVIRONMENT VARIABLES ----
@@ -90,6 +88,13 @@ hl.config({
 		mouse_move_enables_dpms = true,
 		key_press_enables_dpms = true,
 		focus_on_activate = true,
+	},
+})
+
+-- XWAYLAND (Native 1:1 pixel rendering for games & Wine)
+hl.config({
+	xwayland = {
+		force_zero_scaling = true,
 	},
 })
 

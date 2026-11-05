@@ -1,0 +1,14 @@
+[Unit]
+Description=Quickshell Desktop Shell
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/qs
+Restart=always
+RestartSec=1s
+KillMode=mixed
+
+[Install]
+WantedBy=graphical-session.target
