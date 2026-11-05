@@ -149,7 +149,6 @@ PanelWindow {
         // System & Control
         { keys: "SUPER + TAB", desc: "Lock screen (hyprlock)", category: "System" },
         { keys: "SUPER + ESC / `", desc: "Power menu (quickshell powermenu)", category: "System" },
-        { keys: "SUPER + P", desc: "Toggle power profile (Balanced / Performance / Saver)", category: "System" },
         { keys: "SUPER + I", desc: "Toggle quickshell settings", category: "System" },
         { keys: "SUPER + K", desc: "Keybindings cheatsheet & search", category: "System" },
         { keys: "SUPER + N", desc: "Toggle notification center drawer", category: "System" },

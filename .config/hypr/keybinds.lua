@@ -17,8 +17,6 @@ hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd("hyprlock")) -- Lock screen
 
 hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("qs ipc call powermenu toggle"), { description = "Power menu" })
 hl.bind(mainMod .. " + GRAVE", hl.dsp.exec_cmd("qs ipc call powermenu toggle"), { description = "Power menu" })
-hl.bind(mainMod .. " + P", hl.dsp.exec_cmd("bash " .. home .. "/.config/hypr/scripts/toggle-power-profile.sh"), { description = "Toggle power profile (Balanced / Performance / Power Saver)" })
-hl.bind(", XF86Launch4", hl.dsp.exec_cmd("bash " .. home .. "/.config/hypr/scripts/toggle-power-profile.sh"), { description = "Toggle power profile" })
 
 hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("qs ipc call settings toggle")) -- Settings
 hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("qs ipc call keybinds toggle")) -- Keybindings Cheatsheet
