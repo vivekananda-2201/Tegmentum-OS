@@ -24,3 +24,14 @@ vim.api.nvim_create_autocmd("FileChangedShellPost", {
     vim.notify("File changed on disk. Buffer reloaded!", vim.log.levels.INFO, { title = "Auto-reload" })
   end,
 })
+
+-- Disable LazyVim's default wrap_spell autocmd which forcibly enables wrap on text/markdown files
+pcall(vim.api.nvim_del_augroup_by_name, "lazyvim_wrap_spell")
+
+-- Ensure line wrap is disabled across all buffers and filetypes to maintain horizontal layout
+vim.api.nvim_create_autocmd({ "BufEnter", "FileType" }, {
+  group = vim.api.nvim_create_augroup("disable_line_wrap", { clear = true }),
+  callback = function()
+    vim.opt_local.wrap = false
+  end,
+})
